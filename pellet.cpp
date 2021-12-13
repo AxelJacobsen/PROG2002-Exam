@@ -15,7 +15,7 @@
 Pellet::Pellet(int x, int y, std::pair<float, float> shift) {
     XYshift = shift;
     XYpos[0] = x; XYpos[1] = y;
-    initCoords();
+    //initCoords();
 };
 
 /**
@@ -23,6 +23,7 @@ Pellet::Pellet(int x, int y, std::pair<float, float> shift) {
  *
  *  @see   GLfloat getCoordsWithInt(int y,   int x,   int type);
  */
+/*
 void Pellet::initCoords() {
     int loop = 0;
     float Xquart = XYshift.first  / 2.0f;
@@ -37,7 +38,7 @@ void Pellet::initCoords() {
         loop++;
     }
 }
-
+*/
 /**
  *  sets Pellet vertices to 0, effectively removing it
  */

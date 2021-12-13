@@ -9,7 +9,7 @@
 #define __INDLUDE_H
 
  //Shader Inclusion
-#include "shaders/mapShad.h"
+#include "shaders/gridShad.h"
 #include "shaders/pelletsShad.h"
 #include "shaders/ghostShad.h"
 #include "shaders/playerShad.h"

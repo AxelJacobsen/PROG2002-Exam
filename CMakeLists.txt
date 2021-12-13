@@ -16,16 +16,13 @@ add_subdirectory(tinyobjloader)
 add_executable(Pacman
 	main.cpp
 	shaders/playerShad.h
-	"shaders/gridShad.h"
-    shaders/ghostShad.h
-	shaders/pelletsShad.h 
+	shaders/gridShad.h
+        shaders/ghostShad.h
 	shaders/modelShader.h
 	
 	include/glutil.h
 	"character.h"
 	"character.cpp"
-	"pellet.h"
-	"pellet.cpp"
 	"grid.h" 
 	"grid.cpp"
 	"include.h"

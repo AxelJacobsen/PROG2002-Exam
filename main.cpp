@@ -15,7 +15,7 @@
 #include "initialize.h"
 //#include "pacman.h"
 //#include "ghost.h"
-//#include "pellet.h"
+#include "blockSpawner.h"
 #include "grid.h"
 
 // -----------------------------------------------------------------------------
@@ -27,6 +27,7 @@
 int main(){
     //Container definition
     Grid* gGrid;
+    Blockspawner* BlockSpawner;
     //std::vector<Pacman*>    Pacmans;    ///< Contains only pacman, done for ease of use
     //std::vector<Ghost*>     Ghosts;     ///< Contains ghosts
     //std::vector<Pellet*>    Pellets;    ///< Contains All pellets
@@ -39,12 +40,19 @@ int main(){
 
     //Init map
     gGrid = new Grid();
-    std::vector<float>XZYshift = gGrid->getXYZshift();
+    std::vector<float>XYZshift = gGrid->getXYZshift();
     gGrid->getGridCameraPointer(cameraAdress);
     gGrid->compileGridShader();
-    cameraAdress->recieveMap(gGrid->getIntGrid());
-    //printf("Map Loaded\n");
 
+    cameraAdress->recieveIntMap(gGrid->getIntGrid());
+    cameraAdress->recieveFloatMap(gGrid->getFloatGrid());
+    printf("Map Loaded\n");
+
+    BlockSpawner = new Blockspawner();
+    BlockSpawner->getCameraPointer(cameraAdress);
+    BlockSpawner->setXYZshift(XYZshift);
+    BlockSpawner->newBlock();
+    printf("Blockloader Loaded\n");
     //Init pacman
     /*
     Pacmans.push_back(new Pacman(Maps[0]->getPacSpawnPoint(), XYshift));
@@ -141,6 +149,7 @@ int main(){
         lastFrame = currentTime;
         
         gGrid->drawGrid();
+        BlockSpawner->drawBlocks();
         /*
         if (Pacmans[0]->getRun()) {
             Pacmans[0]->drawPacman();

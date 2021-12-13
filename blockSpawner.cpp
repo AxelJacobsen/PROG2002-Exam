@@ -54,16 +54,6 @@ void Pacman::updateLerp() {
 }
 
 
-void Pacman::compilePacShader() {
-    shaderProgram = CompileShader(  playerVertexShaderSrc,
-                                    playerFragmentShaderSrc);
-
-    GLint pposAttrib = glGetAttribLocation(shaderProgram, "pPosition");
-    glEnableVertexAttribArray(pposAttrib);
-    glVertexAttribPointer(pposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-}
-
-
 void Pacman::updateDir(int outDir) {
     dir = outDir;
 }
@@ -168,3 +158,141 @@ void Pacman::checkForKeyUpdate() {
         };
     }
 }*/
+void Blockspawner::compileBlockShader() {
+    blockShader = CompileShader(blockVertexShaderSrc,
+                                blockFragmentShaderSrc);
+
+    GLint bposAttrib = glGetAttribLocation(blockShader, "bPosition");
+    glEnableVertexAttribArray(bposAttrib);
+    glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+}
+
+void Blockspawner::newBlock() {
+    std::vector<float> floatVec;
+    currentblockNum++;
+    isActive = true;
+    blockList.push_back(floatVec);
+    int bType = createRandomBlock();
+    switch (bType)
+    {
+    case 0: genCube();   break;
+    case 1: genLblock(); break;
+    case 2: genZblock(); break;
+    case 3: genTblock(); break;
+    default: printf("\nILLEGAL BLOCK TYPE\n");
+        break;
+    }
+};
+
+int Blockspawner::createRandomBlock() {
+        time_t t;
+        srand((unsigned)time(&t));
+        int randType = (rand() % 4);        
+        //UNTILL FURHTER ADO THIS DONT DO SHIT
+
+        return 0;
+};
+
+void Blockspawner::drawBlocks() {
+    auto blockVAO = compileVertices();
+    /*
+    GLuint gtexAttrib = glGetAttribLocation(shader, "gTexcoord");
+    glEnableVertexAttribArray(gtexAttrib);
+    glVertexAttribPointer(gtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    */
+    auto ghostVertexColorLocation = glGetUniformLocation(blockShader, "bColor");
+    //auto ghostTextureLocation = glGetUniformLocation(shader, "b_GhostTexture");
+    glUseProgram(blockShader);
+    glBindVertexArray(blockVAO);
+    //glUniform1i(ghostTextureLocation, 1);
+    /*
+    printf("Forjulsstemning\n");
+    for (int b = 0; b < (blockList.size()); b++) {
+        printf("romjula %i", b);
+        glUniform4f(ghostVertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void*)blockList[b].size());
+    }
+    printf("nyttårsaften\n");*/
+    glUniform4f(ghostVertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+    printf("SIZE OF MY BALL: %i", vertices.size());
+    glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, (const void*)0);
+    CleanVAO(blockVAO);
+}
+
+/**
+ *  Compiles all Pellet verticie lists into a large vector and calls CreateObject
+ *
+ *  @param itObj - which type of object to iterate, here always pellet
+ *
+ *  @see Pellet::getVertCoord(int index);
+ *  @see GLuint CreateObject(GLfloat* object, int size, const int stride);
+ *
+ *  @return returns VAO gotten from CreateObject func
+ */
+GLuint Blockspawner::compileVertices() {
+    vertices.clear();
+    int stride = 5;
+    for (int i = 0; i < blockList.size(); i++){
+        for (auto& it : blockList[i]) {
+            vertices.push_back(it);
+        }
+    }
+    return CreateObject(&vertices[0], vertices.size() * sizeof(vertices[0]), stride);
+}
+
+void Blockspawner::genCube() {
+    for (int i = 0; i < 3; i++) {
+        float value = (bCamHolder->getCamFloatMapVal(0, 0, 0, i));
+        blockList[currentblockNum].push_back(value); //inits one corner
+    }
+
+    int mod = 0;
+    int rep = 3;
+    for (int b = 0; b < 7; b++) {
+        if (b == 3) { mod = 1; rep = 0; }
+        for (int XYZ = 0; XYZ < 3; XYZ++) {
+            blockList[currentblockNum].push_back(
+            generateBlockCoord( blockList[currentblockNum][0], 
+                                blockList[currentblockNum][1], 
+                                blockList[currentblockNum][2], mod, rep));
+            
+            rep++;
+        }
+    }
+    for (auto& it : blockList[currentblockNum]) {
+        printf("%f\n", it);
+    }
+}
+
+void Blockspawner::genLblock() {
+
+}
+
+void Blockspawner::genZblock() {
+
+}
+
+void Blockspawner::genTblock() {
+
+}
+
+float Blockspawner::generateBlockCoord(int x, int y, int z, int mod, int loop) {
+    GLfloat tempXs, tempYs;
+    if (x == 0 && y == 0) { tempXs = 0, tempYs = 0; }
+    else { tempXs = (Xshift * x), tempYs = (Yshift * y); }
+
+    switch (loop) {
+    case 0:   tempXs;             return (tempXs - 1.0f);  // Top Left
+    case 1:   tempYs;             return (tempYs - 1.0f);  // Top Left
+
+    case 3:   tempXs;             return (tempXs - 1.0f);  // Bot Left
+    case 4:   tempYs += Yshift;   return (tempYs - 1.0f);  // Bot Left
+
+    case 6:   tempXs += Xshift;   return (tempXs - 1.0f);  // Bot Right
+    case 7:   tempYs += Yshift;   return (tempYs - 1.0f);  // Bot Right
+
+    case 9:   tempXs += Xshift;   return (tempXs - 1.0f);  // Top Right
+    case 10:  tempYs;             return (tempYs - 1.0f);  // Top Right
+    default: return (float(z) + (Zshift*mod));
+    }
+}

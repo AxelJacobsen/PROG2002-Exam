@@ -36,13 +36,22 @@ out vec4 color;
 
 uniform sampler2D u_gridTexture;
 uniform vec4 u_Color;
+uniform float boolText;
 
 void main()
 {
-	vec4 textColorG = texture(u_gridTexture, gridTexcoord);
+vec4 textColorG = texture(u_gridTexture, gridTexcoord);
+if (0.5f < boolText){
 	color = textColorG;
+} else if (boolText < 1.0f){color = u_Color;}
+else {color = textColorG;}
 }
 )";
 
 
 #endif // __GRIDSHAD_H_
+
+/*
+
+
+*/

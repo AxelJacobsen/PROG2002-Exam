@@ -21,8 +21,9 @@ Grid::Grid() {
     Xshift = 2.0f / float(width);
     Yshift = 2.0f / float(height);
     Zshift = 2.0f / float(depth+1);
-    gridFloatCreate();
+    gridTextureFloatCreate();
     loadGridSprite();
+    fillGridCoords();
 }
 
 /**
@@ -33,7 +34,7 @@ Grid::Grid() {
  *  @see Map::loopOrder(int num)
  *  @see Map::handleMapTexCoords(int rep)
  */
-void Grid::gridFloatCreate() {
+void Grid::gridTextureFloatCreate() {
     int tempTxtRep = 0;
     for (int Zlevel = 0; Zlevel < depth + 1; Zlevel++) {
         for (int inverse = -1; inverse < 2; inverse+=2) {
@@ -41,9 +42,9 @@ void Grid::gridFloatCreate() {
                 tempTxtRep = 0;
                 for (int inner = 0; inner < 2; inner++) {
                     for (int outer = 0; outer < 2; outer++) {
-                        gridF.push_back(((Xshift * Xwall) + (Xshift * outer))-1);
-                        gridF.push_back(float(inverse));
-                        gridF.push_back(((Zshift * Zlevel) + (Zshift * inner))-1);
+                        gridFwText.push_back(((Xshift * Xwall) + (Xshift * outer))-1);
+                        gridFwText.push_back(float(inverse));
+                        gridFwText.push_back(((Zshift * Zlevel) + (Zshift * inner))-1);
                         handleGridTexCoords(tempTxtRep);
                         tempTxtRep++;
                     }
@@ -54,9 +55,9 @@ void Grid::gridFloatCreate() {
                 tempTxtRep = 0;
                 for (int inner = 0; inner < 2; inner++) {
                     for (int outer = 0; outer < 2; outer++) {
-                        gridF.push_back(float(inverse));
-                        gridF.push_back(((Yshift * Ywall) + (Yshift * outer))-1);
-                        gridF.push_back(((Zshift * Zlevel) + (Zshift * inner))-1);
+                        gridFwText.push_back(float(inverse));
+                        gridFwText.push_back(((Yshift * Ywall) + (Yshift * outer))-1);
+                        gridFwText.push_back(((Zshift * Zlevel) + (Zshift * inner))-1);
                         handleGridTexCoords(tempTxtRep);
                         tempTxtRep++;
                     }
@@ -70,9 +71,9 @@ void Grid::gridFloatCreate() {
             tempTxtRep = 0;
             for (int UD = 0; UD < 2; UD++) {
                 for (int LR = 0; LR < 2; LR++) {
-                    gridF.push_back(((Xshift * backX) + (Xshift * LR)) - 1);
-                    gridF.push_back(((Yshift * backY) + (Yshift * UD)) - 1);
-                    gridF.push_back(-1.0f);
+                    gridFwText.push_back(((Xshift * backX) + (Xshift * LR)) - 1);
+                    gridFwText.push_back(((Yshift * backY) + (Yshift * UD)) - 1);
+                    gridFwText.push_back(-1.0f);
                     handleGridTexCoords(tempTxtRep);
                     tempTxtRep++;
                 }
@@ -105,8 +106,29 @@ void Grid::handleGridTexCoords(int rep) {
     case 3:  temp = { 1, 1 };   break;
     default: temp = { -1,-1 };  break;
     }
-    gridF.push_back(temp.first);
-    gridF.push_back(temp.second);
+    gridFwText.push_back(temp.first);
+    gridFwText.push_back(temp.second);
+}
+
+/**
+ *  Loads texture for map Wall
+ *
+ *  @see load_opengl_texture(const std::string& filepath, GLuint slot)
+ */
+void Grid::fillGridCoords() {
+    for (int z = 0; z < depth + 1; z++) {
+        for (int y = 0; y < height + 1; y++) {
+            for (int x = 0; x < width + 1; x++) {
+                gridContF[x][y][z][0] = (x  * Xshift)-1.0f;
+                gridContF[x][y][z][1] = (y * Yshift)-1.0f;
+                gridContF[x][y][z][2] = (z  * Zshift)-1.0f;
+                for (int test = 0; test < 3; test++) {
+                    printf("%f\t", gridContF[x][y][z][test]);
+                }
+                printf("\n");
+            }
+        }
+    }
 }
 
 /**
@@ -126,6 +148,7 @@ void Grid::compileGridShader(){
     glEnableVertexAttribArray(gPosAttrib);
     glVertexAttribPointer(gPosAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
     callCreateGridVao();
+
     GLuint gtexAttrib = glGetAttribLocation(gridShaderProgram, "gTexcoord");
     glEnableVertexAttribArray(gtexAttrib);
     glVertexAttribPointer(gtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -134,8 +157,8 @@ void Grid::compileGridShader(){
 }
 
 void Grid::callCreateGridVao() {
-    int gridSize = gridF.size();
-    gridVAO = createGrid(gridSize);
+    int gridSize = gridFwText.size();
+    gridTextureVAO = createGrid(gridSize, true);
 }
 
 // -----------------------------------------------------------------------------
@@ -150,17 +173,34 @@ void Grid::callCreateGridVao() {
  *
  *  @return returns vao of map
  */
-GLuint Grid::createGrid(float size) {
+GLuint Grid::createGrid(float size, bool texture) {
     std::vector<GLuint> mapIndices;
-    for (int o = 0; o < (size / 3); o += 4) {
-        for (int m = 0; m < 2; m++) {
-            for (int i = o; i < (o + 3); i++) {
-                int hold = getIndices(o, m, i);
-                if ((i - o) == 2 && m != 1) { hold++; }
-                mapIndices.push_back(hold);
+    if (texture){
+        for (int o = 0; o < (size / 3); o += 4) {
+            for (int m = 0; m < 2; m++) {
+                for (int i = o; i < (o + 3); i++) {
+                    int hold = getIndices(o, m, i);
+                    if ((i - o) == 2 && m != 1) { hold++; }
+                    mapIndices.push_back(hold);
+                }
             }
+        };
+    }
+    else {
+        for (int i = 0; i < size/4; i+=4) {
+            mapIndices.push_back((i));
+            mapIndices.push_back((i+1));
+            
+            mapIndices.push_back((i+1));
+            mapIndices.push_back((i+3));
+            
+            mapIndices.push_back((i+3));
+            mapIndices.push_back((i+2));
+            
+            mapIndices.push_back((i+2));
+            mapIndices.push_back((i));
         }
-    };
+    }
 
     GLuint vao;
     glCreateVertexArrays(1, &vao);
@@ -172,8 +212,8 @@ GLuint Grid::createGrid(float size) {
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER,
-        size * sizeof((gridF)[0]),
-        (&gridF[0]),
+        size * sizeof((gridFwText)[0]),
+        (&gridFwText[0]),
         GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -193,6 +233,7 @@ GLuint Grid::createGrid(float size) {
 void Grid::cleanGrid() {
     glDeleteProgram(gridShaderProgram);
     glDeleteTextures(1, &gridSprite);
+    CleanVAO(gridTextureVAO);
     CleanVAO(gridVAO);
 }
 
@@ -206,12 +247,22 @@ void Grid::cleanGrid() {
  */
 void Grid::drawGrid() {
     auto gridTextureLocation = glGetUniformLocation(gridShaderProgram, "u_gridTexture");
-
+    auto gridIsTextured = glGetUniformLocation(gridShaderProgram, "boolText");
     auto gridVertexColorLocation = glGetUniformLocation(gridShaderProgram, "u_Color");
+
     glUseProgram(gridShaderProgram);
     glUniform1i(gridTextureLocation, 0);
     gCamHolder->applycamera(gridShaderProgram, width, height);
+    glBindVertexArray(gridTextureVAO);
+    glUniform1f(gridIsTextured, 1.0f);
+    glDrawElements(GL_TRIANGLES, gridFwText.size(), GL_UNSIGNED_INT, (const void*)0);
+    
+    if (!hasInitVao) { gridVAO = createGrid(gridFwText.size(), false); hasInitVao = true; }
+
+    glUseProgram(gridShaderProgram);
+    gCamHolder->applycamera(gridShaderProgram, width, height);
     glBindVertexArray(gridVAO);
-    glUniform4f(gridVertexColorLocation, 0.5f, 0.5f, 0.5f, 1.0f);
-    glDrawElements(GL_TRIANGLES, gridF.size(), GL_UNSIGNED_INT, (const void*)0);
+    glUniform4f(gridVertexColorLocation, 0.1f, 0.9f, 0.1f, 1.0f);
+    glUniform1f(gridIsTextured, 0.0f);
+    glDrawElements(GL_LINES, gridFwText.size(), GL_UNSIGNED_INT, (const void*)0);
 }

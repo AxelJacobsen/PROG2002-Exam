@@ -10,7 +10,7 @@
  *  @see Character:: convertToVert();
  */
 void Character::characterInit() {
-    convertToVert();
+    //convertToVert();
     lerpStart[0] = vertices[0];
     lerpStart[1] = vertices[1];
     if (dir == 2) {
@@ -38,6 +38,7 @@ void Character::characterInit() {
  *
  *  @see GLfloat getCoordsWithInt(int y, int x, int type);
  */
+/*
 void Character::convertToVert() {
     int loop = 0, callCount = 0;
     for (int y = 0; y < 4; y++) {
@@ -48,7 +49,7 @@ void Character::convertToVert() {
         loop += 2;
     }
 }
-
+*/
 /**
  *  Checks if requested drection is legal/wall or not
  *
@@ -58,6 +59,7 @@ void Character::convertToVert() {
  * 
  *  @return   bool whether is is a legal direction or not
  */
+/*
 bool Character::getLegalDir(int dir) {
     int testPos[2] = { XYpos[0], XYpos[1] };
 
@@ -74,7 +76,7 @@ bool Character::getLegalDir(int dir) {
     else { return false; }    //incase moving outside map illegal untill further notice
     return false;
 };
-
+*/
 /**
  *  Updates LERP coords
  */
@@ -99,7 +101,7 @@ void Character::getLerpCoords() {
  */
 void Character::changeDir() {
     
-    bool legal = getLegalDir(dir);
+    bool legal = true;//getLegalDir(dir);
 
     if (prevDir == 0) { prevDir = dir; }    //Ensures that prevDir can never be 0 even if you hard-code it :)
 

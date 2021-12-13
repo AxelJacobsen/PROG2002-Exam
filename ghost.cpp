@@ -42,7 +42,7 @@ void Ghost::changeDir() {
     if (AIdelay == 0) { dir = ghostGetRandomDir(); AIdelay = ((rand() + 4) % 10); legal = true; }
     else {
         AIdelay--;
-        legal = getLegalDir(dir);
+        legal = true;//getLegalDir(dir);
     };
 
     if (legal && (lerpProg <= 0 || lerpProg >= 1)) {
@@ -88,6 +88,7 @@ void Ghost::compileGhostModelShader() {
  *  @see      Camera:: getCoordsWithInt();
  *  @return   returns wheter or not pacman and ghost are crashing
  */
+/*
 bool Ghost::checkGhostCollision(float pacX, float pacY, std::pair<float,float> xyshift) {
 
     float pacXpos = CamHolder->getCoordsWithInt(pacY, pacX, 0, 0.0f, xyshift),
@@ -104,8 +105,7 @@ bool Ghost::checkGhostCollision(float pacX, float pacY, std::pair<float,float> x
     if (length < (xyshift.first + xyshift.second) / 5.0f) { return true; }
     else { false; }
     return false;
-}
-
+}*/
 /**
  *  Bruteforces a legal direction for AI
  *
@@ -125,7 +125,7 @@ int Ghost::ghostGetRandomDir() {
         case 2: temp = 3;    break;
         case 3: temp = 9;    break;
         }
-    } while (!getLegalDir(temp));
+    } while (false);//!getLegalDir(temp)
     return temp;
 }
 

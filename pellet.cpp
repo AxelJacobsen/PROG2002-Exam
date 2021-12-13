@@ -15,7 +15,7 @@
 Pellet::Pellet(int x, int y, std::pair<float, float> shift) {
     XYshift = shift;
     XYpos[0] = x; XYpos[1] = y;
-    initCoords();
+    //initCoords();
 };
 
 /**
@@ -23,6 +23,7 @@ Pellet::Pellet(int x, int y, std::pair<float, float> shift) {
  *
  *  @see   GLfloat getCoordsWithInt(int y,   int x,   int type);
  */
+/*
 void Pellet::initCoords() {
     int loop = 0;
     float Xquart = XYshift.first  / 2.0f;
@@ -37,7 +38,7 @@ void Pellet::initCoords() {
         loop++;
     }
 }
-
+*/
 /**
  *  sets Pellet vertices to 0, effectively removing it
  */
@@ -92,12 +93,12 @@ bool Pellet::isEnabled() {
                      const std::string& geometryShaderSrc)
  */
 void Pellet::callCompilePelletShader() {
-    pelletShaderProgram = CompileShader(pelletVertexShaderSrc,
-            pelletFragmentShaderSrc, pelletGeometryShaderSrc);
+    //pelletShaderProgram = CompileShader(pelletVertexShaderSrc,
+    //        pelletFragmentShaderSrc, pelletGeometryShaderSrc);
 
-    GLint pelposAttrib = glGetAttribLocation(pelletShaderProgram, "pelPosition");
-    glEnableVertexAttribArray(pelposAttrib);
-    glVertexAttribPointer(pelposAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); 
+    //GLint pelposAttrib = glGetAttribLocation(pelletShaderProgram, "pelPosition");
+    //glEnableVertexAttribArray(pelposAttrib);
+    //glVertexAttribPointer(pelposAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); 
 }
 
 /**

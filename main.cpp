@@ -13,10 +13,10 @@
  */
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "initialize.h"
-#include "pacman.h"
-#include "ghost.h"
-#include "pellet.h"
-#include "map.h"
+//#include "pacman.h"
+//#include "ghost.h"
+//#include "pellet.h"
+#include "grid.h"
 
 // -----------------------------------------------------------------------------
 // ENTRY POINT
@@ -26,10 +26,10 @@
  */
 int main(){
     //Container definition
-    std::vector<Map*>		Maps;		///< Contains only map, permits adding more maps in the future
-    std::vector<Pacman*>    Pacmans;    ///< Contains only pacman, done for ease of use
-    std::vector<Ghost*>     Ghosts;     ///< Contains ghosts
-    std::vector<Pellet*>    Pellets;    ///< Contains All pellets
+    Grid* gGrid;
+    //std::vector<Pacman*>    Pacmans;    ///< Contains only pacman, done for ease of use
+    //std::vector<Ghost*>     Ghosts;     ///< Contains ghosts
+    //std::vector<Pellet*>    Pellets;    ///< Contains All pellets
     Camera* cameraAdress = new Camera();
 
     // Creates coordinates for map
@@ -38,26 +38,28 @@ int main(){
     if (window == nullptr) { return EXIT_FAILURE; }
 
     //Init map
-    Maps.push_back(new Map("../../../../levels/level0"));
-    std::pair<float, float>XYshift = Maps[0]->getXYshift();
-    Maps[0]->getMapCameraPointer(cameraAdress);
-    Maps[0]->compileMapShader();
-    cameraAdress->recieveMap(Maps[0]->getIntMap());
+    gGrid = new Grid();
+    std::vector<float>XZYshift = gGrid->getXYZshift();
+    gGrid->getGridCameraPointer(cameraAdress);
+    gGrid->compileGridShader();
+    cameraAdress->recieveMap(gGrid->getIntGrid());
     //printf("Map Loaded\n");
 
     //Init pacman
+    /*
     Pacmans.push_back(new Pacman(Maps[0]->getPacSpawnPoint(), XYshift));
     Pacmans[0]->compilePacShader();
     Pacmans[0]->setWidthHeight(Maps[0]->getWidthHeight());
     Pacmans[0]->setXYshift(XYshift);
     Pacmans[0]->getCameraPointer(cameraAdress);
-    Pacmans[0]->setVAO(Pacmans[0]->compilePacman());
+    Pacmans[0]->setVAO(Pacmans[0]->compilePacman());*/
     //printf("Pacman Loaded\n");
 
     //Init pellets
-    std::pair<int, int> WidthHeight = Maps[0]->getWidthHeight();
-    for (int y = 0; y < WidthHeight.second; y++) {
-        for (int x = 0; x < WidthHeight.first; x++) {
+    /*
+    std::vector<int> WidthHeightDepth = gGrid->getWHD();
+    for (int y = 0; y < WidthHeightDepth[0]; y++) {
+        for (int x = 0; x < WidthHeightDepth[1]; x++) {
             if (Maps[0]->getMapVal(x, y) == 0) { Pellets.push_back(new Pellet(x, y, XYshift)); }
         }
     }
@@ -114,7 +116,7 @@ int main(){
         }
 
     }
-
+    */
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_MULTISAMPLE);
 
@@ -130,7 +132,7 @@ int main(){
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-
+        glGetError();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //update Time
@@ -138,6 +140,8 @@ int main(){
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
         
+        gGrid->drawGrid();
+        /*
         if (Pacmans[0]->getRun()) {
             Pacmans[0]->drawPacman();
 
@@ -179,7 +183,7 @@ int main(){
                     drawGhostIt->drawGhostsAsModels(currentTime, WidthHeight);
                 }
             }
-            Maps[0]->drawMap();
+            gGrid->drawGrid();
         }
         
         //LERP Update
@@ -206,10 +210,9 @@ int main(){
                         printf("Ghost Collision\n"); Pacmans[0]->setRun(false);
                     }
                 }
-            }
-            glfwSwapBuffers(window);
-        }
-        
+            }*/
+        //}
+        glfwSwapBuffers(window);
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             break;
         }
@@ -228,11 +231,11 @@ int main(){
     }
 
     glUseProgram(0);
-    Maps[0]->cleanMap();
-    Pacmans[0]->cleanCharacter();
-    if (0 < ghostAmount) Ghosts[0]->cleanCharacter();
-    Pellets[0]->cleanPellets();
-
+    gGrid->cleanGrid();
+    //Pacmans[0]->cleanCharacter();
+    //if (0 < ghostAmount) Ghosts[0]->cleanCharacter();
+    //Pellets[0]->cleanPellets();
+    delete(gGrid);
     glfwTerminate();
 
     return EXIT_SUCCESS;

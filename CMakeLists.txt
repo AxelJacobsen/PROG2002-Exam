@@ -16,9 +16,8 @@ add_subdirectory(tinyobjloader)
 add_executable(Pacman
 	main.cpp
 	shaders/playerShad.h
-	shaders/mapShad.h
+	"shaders/gridShad.h"
     shaders/ghostShad.h
-	shaders/pelletsShad.h 
 	shaders/modelShader.h
 	
 	include/glutil.h
@@ -26,8 +25,8 @@ add_executable(Pacman
 	"character.cpp"
 	"pellet.h"
 	"pellet.cpp"
-	"map.h" 
-	"map.cpp"
+	"grid.h" 
+	"grid.cpp"
 	"include.h"
 	"globFunc.h"
 	"globFunc.cpp"
@@ -35,8 +34,8 @@ add_executable(Pacman
 	"initialize.cpp"
 	"ghost.h"
 	"ghost.cpp"
-	"pacman.h"
-	"pacman.cpp"
+	"blockSpawner.h"
+	"blockSpawner.cpp"
 	"camera.h"
 	"camera.cpp" )
 

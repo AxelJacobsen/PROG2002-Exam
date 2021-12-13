@@ -31,9 +31,7 @@ int Camera::checkCardinal(const float xRot, const float yRot) {
  *
  *  @return returns float for correct coord
  */
-GLfloat Camera::getCoordsWithInt(int y, int x, int loop, float layer, std::pair<float, float> shift) {
-    float Xshift = shift.first;
-    float Yshift = shift.second;
+GLfloat Camera::getCoordsWithInt(int y, int x, int loop, float Xshift, float Yshift, float Zshift) {
     GLfloat tempXs, tempYs;
     if (x == 0 && y == 0) { tempXs = 0, tempYs = 0; }
     else { tempXs = (Xshift * float(x)), tempYs = (Yshift * float(y)); }
@@ -50,7 +48,7 @@ GLfloat Camera::getCoordsWithInt(int y, int x, int loop, float layer, std::pair<
 
     case 9:   tempXs += Xshift;   return (tempXs - 1.0f);  // Bot Right
     case 10:  tempYs;             return (tempYs - 1.0f);  // Bot Right
-    default: return layer;
+    default: return Zshift;
     }
 };
 
@@ -63,10 +61,8 @@ GLfloat Camera::getCoordsWithInt(int y, int x, int loop, float layer, std::pair<
  *
  */
 void Camera::applycamera(const GLuint shader, const float width, const float height) {
-    const int spriteSize = 64;
-    
     // pass projection matrix to shader (note that in this case it could change every frame)
-    glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(width) / (float)(height), 0.001f, 2.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(width) / (float)(height), 0.001f, 10.0f);
     GLuint projMat = glGetUniformLocation(shader, "projection");
     glUniformMatrix4fv(projMat, 1, false, glm::value_ptr(projection));
     
@@ -83,6 +79,7 @@ void Camera::applycamera(const GLuint shader, const float width, const float hei
  *  @param ypos - updated yPos of mouse
  *
  */
+ /*
 void Camera::mouseMoveCamera(const double xpos, const double ypos) {
     if (firstMouse)
     {
@@ -116,4 +113,4 @@ void Camera::mouseMoveCamera(const double xpos, const double ypos) {
     int temp = checkCardinal(front.x, front.y);
     if (temp != -1) { setCard(temp); }
     cameraFront = glm::normalize(front);
-}
+}*/

@@ -17,10 +17,8 @@ void Blockspawner::compileBlockShader() {
 void Blockspawner::newBlock() {
     std::vector<float> floatVec;
     currentblockNum++;
-    if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); };
     isActive = true;
     blockList.push_back(floatVec);
-    initializeLerp();
     int bType = createRandomBlock();
     switch (bType)
     {
@@ -31,6 +29,8 @@ void Blockspawner::newBlock() {
     default: printf("\nILLEGAL BLOCK TYPE\n");
         break;
     }
+    if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); }
+    else { liveBlockVAO = compileVertices(); }
 };
 
 int Blockspawner::createRandomBlock() {
@@ -40,18 +40,7 @@ int Blockspawner::createRandomBlock() {
     return randType;
 };
 
-void Blockspawner::initializeLerp() {
-    lerpStart[0] = spawnPoint[0] * Xshift - 1.0f;
-    lerpStart[1] = spawnPoint[1] * Yshift - 1.0f;
-    lerpStart[2] = spawnPoint[2] * Zshift - 1.0f;
-    lerpStop[0] = lerpStart[0];
-    lerpStop[1] = lerpStart[1];
-    lerpStop[2] = lerpStart[2];
-}
-
 void Blockspawner::drawActiveBlocks() {
-    liveBlockVAO = compileVertices();
-    
     GLuint btexAttrib = glGetAttribLocation(blockShader, "bTexcoord");
     glEnableVertexAttribArray(btexAttrib);
     glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -59,13 +48,12 @@ void Blockspawner::drawActiveBlocks() {
     auto blockTextureLocation     = glGetUniformLocation(blockShader, "u_BlockTexture");
 
     glUseProgram(blockShader);
-    transformBlock();
     bCamHolder->applycamera(blockShader, width, height);
+    transformBlock();
     glBindVertexArray(liveBlockVAO);
     glUniform1i(blockTextureLocation, 1);
     
     glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)0);
-    CleanVAO(liveBlockVAO);
 }
 
 void Blockspawner::drawDeadBlocks() {
@@ -237,7 +225,7 @@ void Blockspawner::loadBlockSprite() {
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
-        if (lerpProg > 1 || lerpProg < 0) { if (checkIfHitEnd()) { printf("CrashTest2\n"); killBlock(); } else { requestChangeDir();  //printf("CrashTest4\n");
+        if (lerpProg > 1 || lerpProg < 0) { if (checkIfHitEnd()) { killBlock(); } else { requestChangeDir();
         } }
         else if (lerpStart != lerpStop) { lerpProg += lerpStep; }
         if (lerpProg < 0.6f && lerpProg > 0.5f) {
@@ -286,7 +274,7 @@ void Blockspawner::getLerpCoords() {
                 }
             }
         } 
-        lerpStop[1] = lerpStart[1] -= Yshift; 
+        lerpStop[1] = lerpStart[1] += Yshift; 
         break;     //UP
     case 4: 
         for (int x = 0; x < spatialXYZ.size(); x++) {
@@ -347,4 +335,5 @@ void Blockspawner::transformBlock() {
     GLuint transformationmat = glGetUniformLocation(blockShader, "u_TransformationMat");
 
     glUniformMatrix4fv(transformationmat, 1, false, glm::value_ptr(translation));
+
 }

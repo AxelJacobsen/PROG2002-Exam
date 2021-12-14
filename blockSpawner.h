@@ -19,8 +19,8 @@ class Blockspawner {
 private:
     bool    isActive = false,
             run = true;
-    float   lerpStart[3],               //Contains start coords of LERP
-            lerpStop[3],                //Contains stop  coords of LERP
+    float   lerpStart[3]{0},               //Contains start coords of LERP
+            lerpStop[3]{0},                //Contains stop  coords of LERP
             speedDiv = 15.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
             lerpProg = lerpStep,        //defines progress as step to avoid hickups
@@ -31,7 +31,7 @@ private:
     int     currentblockNum = -1,
             width, height, depth,
             requestedDir = 1,
-            spawnPoint[3] = { 0, 4, 9 };
+            spawnPoint[3] = { 0, 1, 9 };
 
     bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
     bool    heightUpdated = true;
@@ -42,7 +42,6 @@ private:
             blockSprite;
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
-   // std::vector<std::vector<int>> blockIntList; //HoldsXYZints of all blocks
     std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
 
     Camera* bCamHolder;

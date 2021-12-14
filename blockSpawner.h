@@ -84,7 +84,7 @@ public:
                                                     return true;  }
                                                     return false; }
     void  setNewDir(int newDir) { requestedDir = newDir; }
-    void  getLerpCoords();
+    bool  getLerpCoords();
     bool  checkIfHitEnd();
     void  transformBlock();
     void  initializeLerp();

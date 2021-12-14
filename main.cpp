@@ -59,6 +59,7 @@ int main(){
     float deltaTime = 0.0f;	// time between current frame and last frame
     float lastFrame = 0.0f;
     float delay     = 0.005f;
+    int   dropDelay = 20;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
@@ -83,7 +84,11 @@ int main(){
             BlockSpawner->updateBlockLerp();
             //printf("Lerp updated\n");
             frequency = currentTime;
-            
+            if (dropDelay == 0) {
+                dropDelay = 20;
+                BlockSpawner->updateHeight();
+            }
+            else { dropDelay--; }
         }
 
         //printf("Drawing Active blocks\n");

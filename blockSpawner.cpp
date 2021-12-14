@@ -119,7 +119,7 @@ GLuint Blockspawner::compileVertices(bool dead) {
 }
 
 void Blockspawner::genCube(int x, int y, int z) {
-    spatialXYZ[spatialXYZ.size()-1-y][x] = z;
+    spatialXYZ[x][y] = z;
     std::vector<float> tempBasePoints;
     for (int i = 0; i < 3; i++) {
         float value = (bCamHolder->getCamFloatMapVal(x, y, z, i));
@@ -243,19 +243,15 @@ void Blockspawner::updateBlockLerp() {
 
 void Blockspawner::requestChangeDir() {
     if(requestedDir != 0){
-        if (checkIfLegalDir(requestedDir)) {  //else this handles updating lerp
-            lerpStart[0] = lerpStop[0];
-            lerpStart[1] = lerpStop[1];
-            lerpStart[2] = lerpStop[2];
-            Blockspawner::getLerpCoords();
+        lerpStart[0] = lerpStop[0];
+        lerpStart[1] = lerpStop[1];
+        lerpStart[2] = lerpStop[2];
+        if (getLerpCoords()) {
             lerpProg = lerpStep / 2.0f;
-            requestedDir = 0;
         }
+        
+        requestedDir = 0;
     }
-}
-
-bool Blockspawner::checkIfLegalDir(int newDir) {
-    return true;
 }
 
 void Blockspawner::updateHeight() {
@@ -266,60 +262,89 @@ void Blockspawner::updateHeight() {
     }
 }
 
-void Blockspawner::getLerpCoords() {
+bool Blockspawner::getLerpCoords() {
+    std::vector<std::vector<int>> tempXYZ = spatialXYZ;
+    bool legalmove = true;
     switch (requestedDir) {
     case 2: 
-        for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
-            for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
-                if (spatialXYZ[x][y] != 0) {
-                    spatialXYZ[x][y + 1] = spatialXYZ[x][y];
-                    spatialXYZ[x][y] = 0;
+        for (int x = tempXYZ.size() - 1; 0 <= x; x--) {
+            for (int y = tempXYZ[x].size() - 1; 0 <= y; y--) {
+                if (tempXYZ[x][y] != 0) {
+                    if ((y + 1) < tempXYZ[x].size()) {
+                        if (bCamHolder->getCamIntMapVal(x, y + 1, tempXYZ[x][y + 1]) == 0) {
+                            tempXYZ[x][y + 1] = tempXYZ[x][y];
+                            tempXYZ[x][y] = 0;
+                        }
+                        else { legalmove = false; }  
+                    }
+                    else { legalmove = false; }
                 }
             }
         } 
-        lerpStop[1] = lerpStart[1] + Yshift; 
+        if (legalmove) lerpStop[1] = lerpStart[1] + Yshift; 
         break;     //UP
     case 4: 
-        for (int x = 0; x < spatialXYZ.size(); x++) {
-            for (int y = 0; y < spatialXYZ[x].size(); y++) {
-                if (spatialXYZ[x][y] != 0) {
-                    spatialXYZ[x][y - 1] = spatialXYZ[x][y];
-                    spatialXYZ[x][y] = 0;
+        for (int x = 0; x < tempXYZ.size(); x++) {
+            for (int y = 0; y < tempXYZ[x].size(); y++) {
+                if (tempXYZ[x][y] != 0) {
+                    if (0 <= (y - 1)) {
+                        if (bCamHolder->getCamIntMapVal(x, y - 1, tempXYZ[x][y - 1]) == 0){
+                        tempXYZ[x][y - 1] = tempXYZ[x][y];
+                        tempXYZ[x][y] = 0;
+                        }
+                        else { legalmove = false; }
+                    }
+                    else { legalmove = false; }
                 }
             }
-        } 
-        lerpStop[1] = lerpStart[1] - Yshift; 
+        }
+        if (legalmove) lerpStop[1] = lerpStart[1] - Yshift;
         break;     //DOWN
     case 3:     
         for (int x = 0; x < spatialXYZ.size(); x++) {
             for (int y = 0; y < spatialXYZ[x].size(); y++) {
-                if (spatialXYZ[x][y] != 0) {
-                    spatialXYZ[x - 1][y] = spatialXYZ[x][y];
-                    spatialXYZ[x][y] = 0;
+                if (tempXYZ[x][y] != 0) {
+                    if (0 <= (x - 1)) {
+                        if (bCamHolder->getCamIntMapVal(x - 1, y, tempXYZ[x - 1][y]) == 0) {
+                            tempXYZ[x - 1][y] = tempXYZ[x][y];
+                            tempXYZ[x][y] = 0;
+                        }
+                        else { legalmove = false; }
+                    }
+                    else { legalmove = false; }
                 }
             }
         } 
-        lerpStop[0] = lerpStart[0] - Xshift; 
+        if (legalmove) lerpStop[0] = lerpStart[0] - Xshift;
         break;     //LEFT
     case 9: 
         for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
             for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
-                if (spatialXYZ[x][y] != 0) {
-                    spatialXYZ[x + 1][y] = spatialXYZ[x][y];
-                    spatialXYZ[x][y] = 0;
-                }
+                if (tempXYZ[x][y] != 0) {
+                    if ((x + 1) < tempXYZ.size()) {
+                        if (bCamHolder->getCamIntMapVal(x + 1, y, tempXYZ[x + 1][y]) == 0) {
+                            tempXYZ[x + 1][y] = tempXYZ[x][y];
+                            tempXYZ[x][y] = 0;
+                        }
+                        else { legalmove = false; }
+                    }
+                    else { legalmove = false; }
+                } 
             }
         } 
-        lerpStop[0] = lerpStart[0] + Xshift;
+        if (legalmove) lerpStop[0] = lerpStart[0] + Xshift;
         break;     //Right
     default: break;
     }
+    
+    if (legalmove) spatialXYZ = tempXYZ;
     for (int x = 0; x < spatialXYZ.size(); x++) {
         for (int y = 0; y < spatialXYZ[x].size(); y++) {
             printf("%i ", spatialXYZ[x][y]);
         }
         printf("\n");
     }
+    return legalmove;
 }
 
 bool Blockspawner::checkIfHitEnd() {

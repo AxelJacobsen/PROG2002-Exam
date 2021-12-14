@@ -15,7 +15,8 @@
  // -----------------------------------------------------------------------------
 class Camera {  
 private:
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.84f);
+    //glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.84f);
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -0.5f);
     glm::vec3 cameraUp = glm::vec3(0.0f, 0.5f, 0.0f);
     std::vector<std::vector<std::vector<int>>>   gridIntHolder;
@@ -41,8 +42,9 @@ public:
     void setCamFront(glm::vec3  newCameraFront) { cameraFront   = newCameraFront;   };
     void setCamUp(glm::vec3     newCameraUp)    { cameraUp      = newCameraUp;      };
 
-    int     getCamIntMapVal(int x, int y, int z)   { return gridIntHolder[y][x][z];   };
+    int     getCamIntMapVal(int x, int y, int z)   { return gridIntHolder[x][y][z];   };
     float   getCamFloatMapVal(int x, int y, int z, int XYZ) { return gridFloatHolder[x][y][z][XYZ]; };
+
     int     getNewDesDir() { if (keyCalled) { keyCalled = false; return blockDesDir; } else return -1; };
     void    setNewDesDir(int newDir) { blockDesDir = newDir; keyCalled = true; }
     int     checkCardinal(const float xRot, const float yRot);

@@ -98,6 +98,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         case GLFW_KEY_DOWN:  cameraHolder->setNewDesDir(4);  break;
         case GLFW_KEY_LEFT:  cameraHolder->setNewDesDir(3);  break;
         case GLFW_KEY_RIGHT: cameraHolder->setNewDesDir(9);  break;
+
+        case GLFW_KEY_Q: /*CALL DUMBASS FUCKING GARBAGE*/break;
+        case GLFW_KEY_W: /*CALL DUMBASS FUCKING GARBAGE*/break;
+        case GLFW_KEY_E: /*CALL DUMBASS FUCKING GARBAGE*/break;
+        case GLFW_KEY_A: /*CALL DUMBASS FUCKING GARBAGE*/break;
+        case GLFW_KEY_S: /*CALL DUMBASS FUCKING GARBAGE*/break;
+        case GLFW_KEY_D: /*CALL DUMBASS FUCKING GARBAGE*/break;
         }
     }
 }

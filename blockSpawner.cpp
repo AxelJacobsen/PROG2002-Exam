@@ -57,7 +57,6 @@ void Blockspawner::drawActiveBlocks() {
 }
 
 void Blockspawner::drawDeadBlocks() {
-
     GLuint btexAttrib = glGetAttribLocation(blockShader, "bTexcoord");
     glEnableVertexAttribArray(btexAttrib);
     glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -225,9 +224,13 @@ void Blockspawner::loadBlockSprite() {
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
-        if (lerpProg > 1 || lerpProg < 0) { if (checkIfHitEnd()) { killBlock(); } else { requestChangeDir();
+        if (lerpProg > 1 || lerpProg < 0) {
+            int newDir = bCamHolder->getNewDesDir();
+            if (newDir != -1) { printf("New Dir found %i\n", newDir); setNewDir(newDir); }
+            if (checkIfHitEnd()) { killBlock(); } 
+            else { requestChangeDir();
         } }
-        else if (lerpStart != lerpStop) { lerpProg += lerpStep; }
+        else if (lerpStart != lerpStop){ printf("LERPING ASD FUCK RIGHT NOW\n%f\n", lerpProg); lerpProg += lerpStep; }
         if (lerpProg < 0.6f && lerpProg > 0.5f) {
             updateHeight();
         }
@@ -335,5 +338,4 @@ void Blockspawner::transformBlock() {
     GLuint transformationmat = glGetUniformLocation(blockShader, "u_TransformationMat");
 
     glUniformMatrix4fv(transformationmat, 1, false, glm::value_ptr(translation));
-
 }

@@ -21,7 +21,7 @@ private:
             run = true;
     float   lerpStart[3]{0},               //Contains start coords of LERP
             lerpStop[3]{0},                //Contains stop  coords of LERP
-            speedDiv = 15.0f,           //Higher number = slower speed
+            speedDiv = 20.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
             lerpProg = lerpStep,        //defines progress as step to avoid hickups
             Xshift = 0.0f, 
@@ -88,6 +88,7 @@ public:
     bool  checkIfHitEnd();
     void  transformBlock();
     void  initializeLerp();
+    bool  isRun(bool stop) { if (stop) { run = false; } return run; }
 };  
 
 #endif

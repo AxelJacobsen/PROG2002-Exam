@@ -83,30 +83,30 @@ GLuint Blockspawner::compileVertices() {
 void Blockspawner::genCube() {
     std::vector<float> tempBasePoints;
     for (int i = 0; i < 3; i++) {
-        float value = (bCamHolder->getCamFloatMapVal(2, 3, 10, i));
+        float value = (bCamHolder->getCamFloatMapVal(1, 0, 10, i));
         tempBasePoints.push_back(value);
     }
     int loop = 0, rep = 0, face = 0;
     int pList[4]  { 0 , 3 , 6 , 9 };
     int hList[4]  { 1 , 1 , 1 , 1 };
-    for (int b = 1; b < 25; b++) {
+    for (int b = 0; b < 24; b++) {
         if ((b != 0 && b % 4 == 0)) { 
-            loop = 0;
+            loop = 0; 
+            face++;
             switch (face) {
-            case 0: hList[0] = 1; hList[1] = 1; hList[2] = 1; hList[3] = 1; break;
+            case 0: hList[0] = 1; hList[1] = 1; hList[2] = 1; hList[3] = 1; break;  //FRONT
 
-            case 1: hList[0] = 0; hList[1] = 0; hList[2] = 0; hList[3] = 0; break;
+            case 1: hList[0] = 0; hList[1] = 0; hList[2] = 0; hList[3] = 0; break;  //BACK
 
-            case 2: pList[0] = 0; pList[1] = 3; pList[2] = 3; pList[3] = 0;
+            case 2: pList[0] = 0; pList[1] = 3; pList[2] = 3; pList[3] = 0;         //LEFT
                     hList[0] = 1; hList[1] = 1; hList[2] = 0; hList[3] = 0; break;
 
-            case 3: pList[0] = 9; pList[1] = 6; pList[2] = 6; pList[3] = 9; break;
+            case 3: pList[0] = 9; pList[1] = 6; pList[2] = 6; pList[3] = 9; break;  //RIGHT
 
-            case 4: pList[0] = 0; pList[1] = 9; pList[2] = 9; pList[3] = 0; break;
+            case 4: pList[0] = 0; pList[1] = 9; pList[2] = 9; pList[3] = 0; break;  //TOP
 
-            case 5: pList[0] = 3; pList[1] = 6; pList[2] = 6; pList[3] = 3; break;
+            case 5: pList[0] = 3; pList[1] = 6; pList[2] = 6; pList[3] = 3; break;  //BOT
             }
-            face++;
         }
         rep = pList[loop];
         for (int XYZ = 0; XYZ < 3; XYZ++) {

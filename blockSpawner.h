@@ -33,6 +33,7 @@ private:
 
     GLuint blockVAO;
     GLuint blockShader;
+    GLuint blockSprite;
 
     std::vector<std::vector<float>>blockList;  //HoldsXYZ of one corner for a new block
     std::vector<std::vector<int>>blockIntList; //HoldsXYZints of all blocks
@@ -40,28 +41,11 @@ private:
 
     Camera* bCamHolder;
 public:
-    Blockspawner() {};
+    Blockspawner() { 
+        loadBlockSprite(); 
+        compileBlockShader(); 
+    };
     ~Blockspawner() {};
-
-    //virtual void changeDir();
-    //virtual void updateLerp();
-    void compilePacShader();
-    void updateDir(int outDir);
-    void pacAnimate();
-    void updateCard(int newDir);
-    int  getCard();
-    void loadPacSpriteSheet();
-    void deletePacSpriteSheet();
-    bool updatePelletState(bool change);
-    void updateAnimDel(int val, bool set);
-    bool getRun()       { return run; };
-    float getLerpProg() { return lerpProg; }
-    void setRun(const bool runUpdate) { run = runUpdate; };
-    GLuint compilePacman();
-    void drawPacman();
-    void transformPacman();
-    void moveCamera(float x, float y);
-    void checkForKeyUpdate();
 
     void newBlock();
     int createRandomBlock();
@@ -73,9 +57,11 @@ public:
     void  genLblock();
     void  genZblock();
     void  genTblock();
-    float generateBlockCoord(int x, int y, int z, int mod, int loop);
+    float generateBlockCoord(float x, float y, float z, int mod, int loop);
     void  setXYZshift(std::vector<float> XYZshift) { Xshift = XYZshift[0], Yshift = XYZshift[1], Zshift = XYZshift[2]; }
     void  getCameraPointer(Camera* newCamera) { bCamHolder = newCamera; };
+    void  handleBLockTextureCoords(int loop);
+    void  loadBlockSprite();
 };
 
 #endif

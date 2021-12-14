@@ -32,15 +32,15 @@ in vec2 vsTexcoord;
 /** Outputs */
 out vec4 color;
 
-uniform sampler2D u_PlayerTexture;
+uniform sampler2D u_BlockTexture;
 uniform vec4 u_Color;
 
 void main()
 {
-	vec4 textColorP = texture(u_PlayerTexture, vsTexcoord);
-	if(textColorP.a < 0.1)
+	vec4 textColorB = texture(u_BlockTexture, vsTexcoord);
+	if(textColorB.a < 0.1)
         discard;
-	color = u_Color;
+	color = textColorB;
 }
 )";
 

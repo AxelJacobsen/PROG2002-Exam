@@ -47,7 +47,7 @@ public:
     int     getCard()             { return pacCard;       };
     void    setCard(int newCard)  { pacCard = newCard; };
     int     getCamIntMapVal(int x, int y, int z)   { return gridIntHolder[y][x][z];   };
-    int     getCamFloatMapVal(int x, int y, int z, int XYZ) { return gridFloatHolder[x][y][z][XYZ]; };
+    float   getCamFloatMapVal(int x, int y, int z, int XYZ) { return gridFloatHolder[x][y][z][XYZ]; };
     int     getNewDesDir() { if (keyCalled) { keyCalled = false; return blockDesDir; } else return -10; };
     void    setNewDesDir(int newDir) { blockDesDir = newDir; keyCalled = true; }
     int     checkCardinal(const float xRot, const float yRot);

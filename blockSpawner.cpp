@@ -120,6 +120,7 @@ GLuint Blockspawner::compileVertices(bool dead) {
 }
 
 void Blockspawner::genCube(int x, int y, int z) {
+    spatialXYZ[x][z] = y;
     std::vector<float> tempBasePoints;
     for (int i = 0; i < 3; i++) {
         float value = (bCamHolder->getCamFloatMapVal(x, y, z, i));
@@ -161,10 +162,10 @@ void Blockspawner::genCube(int x, int y, int z) {
 }
     
 void Blockspawner::genLblock() {
-    genCube(0,4,9);
-    genCube(1,4,9);
-    genCube(2,4,9);
-    genCube(2,3,9);
+    genCube(0, 4, 9);
+    genCube(1, 4, 9);
+    genCube(2, 4, 9);
+    genCube(2, 3, 9);
 }
 
 void Blockspawner::genZblock() {
@@ -223,12 +224,56 @@ void Blockspawner::loadBlockSprite() {
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
+        if (lerpProg > 1 || lerpProg < 0) { requestChangeDir(); }
+        else { lerpProg += lerpStep; }
+        if (lerpProg < 0.6f && lerpProg > 0.5f) {
+            updateHeight();
+        }
     }
     else {
         newBlock();
     }
 }
 
-bool Blockspawner::checkIfLegalDir() {
+void Blockspawner::requestChangeDir() {
+    /*
+    bool legal = true;
+    legal = checkIfLegalDir(dir);
+
+    int modDir = prevDir;                   //New mod value used to ensure snappier movement
+    if (legal && (dir < prevDir) && (prevDir % dir == 0)) { modDir = dir; } //This fixes problem where smaller numbers got mod'd by a larger number
+
+    if (legal && (dir % modDir == 0) && dir != prevDir) {   //Incase you are trying to turn 180 degrees this procs
+        float coordHolder[2];
+
+        coordHolder[0] = lerpStop[0];   coordHolder[1] = lerpStop[1];
+        lerpStop[0] = lerpStart[0];     lerpStop[1] = lerpStart[1];
+        lerpStart[0] = coordHolder[0];  lerpStart[1] = coordHolder[1];
+
+        if (lerpProg < 0.0f) { lerpProg = 1.0f; }            //This stops skiping a tile if lerpProg is over 1 or under 0
+        else if (1.0f < lerpProg) { lerpProg = lerpStep / 2.0f; }
+        else { lerpProg = (1 - lerpProg); }
+
+        Character::getLerpCoords();
+        prevDir = dir;
+    }
+    if (legal && (lerpProg <= 0 || lerpProg >= 1)) {  //else this handles updating lerp
+        lerpStart[0] = lerpStop[0];
+        lerpStart[1] = lerpStop[1];
+        Character::getLerpCoords();
+        lerpProg = lerpStep / 2.0f;
+        prevDir = dir;
+    }*/
+}
+
+bool Blockspawner::checkIfLegalDir(int newDir) {
     return true;
+}
+
+void Blockspawner::updateHeight() {
+    for (auto& xIt : spatialXYZ) { 
+        for (auto& yIt : xIt) { 
+            if (0 < yIt) { yIt--; }
+        } 
+    }
 }

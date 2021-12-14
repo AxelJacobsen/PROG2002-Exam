@@ -24,13 +24,16 @@ private:
             speedDiv = 15.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
             lerpProg = lerpStep,        //defines progress as step to avoid hickups
-            Xshift = 0.0f, Yshift = 0.0f, Zshift = 0.0f;
+            Xshift = 0.0f, 
+            Yshift = 0.0f, 
+            Zshift = 0.0f;
 
-    int     XYZpos[3],
-            currentblockNum = -1,
-            width, height, depth;
+    int     currentblockNum = -1,
+            width, height, depth,
+            requestedDir = 1;
 
     bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
+    bool    heightUpdated = true;
 
     GLuint  liveBlockVAO,
             deadBlockVAO,
@@ -39,6 +42,7 @@ private:
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
     std::vector<std::vector<int>>blockIntList; //HoldsXYZints of all blocks
+    std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
 
     Camera* bCamHolder;
 public:
@@ -69,8 +73,20 @@ public:
     void  handleBLockTextureCoords(int loop);
     void  loadBlockSprite();
     void  updateBlockLerp();
-    void  killBlock() { isActive = false; };
-    bool  checkIfLegalDir();
-};
+    void  killBlock() { isActive = false; for (auto& xIt : spatialXYZ) { for (auto& yIt : xIt) { yIt = 0; } } };
+    void  requestChangeDir();
+    bool  checkIfLegalDir(int newDir);
+    void  updateHeight();
+    bool  getHeightUpdated() { if (heightUpdated) { heightUpdated = false; 
+                                                    return true;  }
+                                                    return false; }
+    void setHeight(std::vector<int> WHD) { 
+        width = WHD[0]; height = WHD[1]; depth = WHD[2]; 
+        spatialXYZ = 
+            std::vector<std::vector<int>>(width,
+            std::vector<int>(height));
+    }
+   
+};  
 
 #endif

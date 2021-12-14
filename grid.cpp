@@ -36,13 +36,9 @@ Grid::Grid(int w, int h, int d) {
         std::vector<std::vector<float>>((depth + 1),
         std::vector<float>(3, 0))));
 
-    printf("PreTextGen\n");
     gridTextureFloatCreate();
-    printf("PreGridSprite\n");
     loadGridSprite();
-    printf("PreCoordGen\n");
     fillGridCoords();
-    printf("PostCoordGen\n");
 }
 
 

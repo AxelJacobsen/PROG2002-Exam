@@ -16,15 +16,35 @@
 *   @see Map::mapFloatCreate()
 *   @see Map::loadMapSpriteSheet()
 */
-Grid::Grid() {
+Grid::Grid(int w, int h, int d) {
+    width = w;
+    height = h;
+    depth = d;
     // Read from level file;
     Xshift = 2.0f / float(width);
     Yshift = 2.0f / float(height);
-    Zshift = 2.0f / float(depth+1);
+    Zshift = 2.0f / float(depth);
+
+    gridContI = 
+        std::vector<std::vector<std::vector<int>>>(width, 
+        std::vector<std::vector<int>>(height, 
+        std::vector<int>(depth)));
+
+    gridContF = 
+        std::vector<std::vector<std::vector<std::vector<float>>>>((width + 1),
+        std::vector<std::vector<std::vector<float>>>((height + 1),
+        std::vector<std::vector<float>>((depth + 1),
+        std::vector<float>(3, 0))));
+
+    printf("PreTextGen\n");
     gridTextureFloatCreate();
+    printf("PreGridSprite\n");
     loadGridSprite();
+    printf("PreCoordGen\n");
     fillGridCoords();
+    printf("PostCoordGen\n");
 }
+
 
 /**
  *  Creates map coordinates
@@ -152,8 +172,6 @@ void Grid::compileGridShader(){
     GLuint gtexAttrib = glGetAttribLocation(gridShaderProgram, "gTexcoord");
     glEnableVertexAttribArray(gtexAttrib);
     glVertexAttribPointer(gtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
-    
 }
 
 void Grid::callCreateGridVao() {

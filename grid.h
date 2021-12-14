@@ -15,7 +15,7 @@
   */
 class Grid {
 private:
-    int width = 5, height = 5, depth  = 10;
+    int width, height, depth;
     float Xshift, Yshift, Zshift;
     bool hasInitVao = false;
 
@@ -23,21 +23,15 @@ private:
     GLuint gridVAO, gridTextureVAO;
     GLuint gridSprite;
 
-    std::vector<std::vector<std::vector<int>>> gridContI =
-        std::vector<std::vector<std::vector<int>>>(width, std::vector<std::vector<int>>(height, std::vector<int>(depth)));
-
-    std::vector<std::vector<std::vector<std::vector<float>>>> gridContF =
-            std::vector<std::vector<std::vector<std::vector<float>>>>((width+1), 
-            std::vector<std::vector<std::vector<float>>>((height+1), 
-            std::vector<std::vector<float>>((depth+1), 
-            std::vector<float>(3,0))));
+    std::vector<std::vector<std::vector<int>>> gridContI;
+    std::vector<std::vector<std::vector<std::vector<float>>>> gridContF;
 
     std::vector<float> gridFwText;
     std::vector<float> gridF;
 
     Camera* gCamHolder;
 public:
-    Grid();
+    Grid(int w, int h, int d);
     void   gridTextureFloatCreate();
     int    findWhatLines(const int x, const int y);
     void   compileGridShader();

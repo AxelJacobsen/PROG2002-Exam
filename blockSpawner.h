@@ -23,25 +23,29 @@ private:
             lerpStop[3],                //Contains stop  coords of LERP
             speedDiv = 15.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
-            lerpProg = lerpStep;        //defines progress as step to avoid hickups
-    float   Xshift = 0.0f, Yshift = 0.0f, Zshift = 0.0f;
+            lerpProg = lerpStep,        //defines progress as step to avoid hickups
+            Xshift = 0.0f, Yshift = 0.0f, Zshift = 0.0f;
 
     int     XYZpos[3],
-            currentblockNum = -1;
+            currentblockNum = -1,
+            width, height, depth;
 
     bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
 
-    GLuint blockVAO;
-    GLuint blockShader;
-    GLuint blockSprite;
+    GLuint  liveBlockVAO,
+            deadBlockVAO,
+            blockShader,
+            blockSprite;
 
-    std::vector<std::vector<float>>blockList;  //HoldsXYZ of one corner for a new block
+    std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
     std::vector<std::vector<int>>blockIntList; //HoldsXYZints of all blocks
-    std::vector<GLfloat> vertices;
 
     Camera* bCamHolder;
 public:
-    Blockspawner() { 
+    Blockspawner(std::vector<int> whd) { 
+        width  = whd[0];
+        height = whd[1];
+        depth  = whd[2];
         loadBlockSprite(); 
         compileBlockShader(); 
     };
@@ -49,11 +53,13 @@ public:
 
     void newBlock();
     int createRandomBlock();
-    void drawBlocks();
+    void drawActiveBlocks();
+    void drawDeadBlocks();
     GLuint compileVertices();
+    GLuint compileVertices(bool dead);
     void compileBlockShader();
 
-    void  genCube();
+    void  genCube(int x, int y, int z);
     void  genLblock();
     void  genZblock();
     void  genTblock();
@@ -62,6 +68,9 @@ public:
     void  getCameraPointer(Camera* newCamera) { bCamHolder = newCamera; };
     void  handleBLockTextureCoords(int loop);
     void  loadBlockSprite();
+    void  updateBlockLerp();
+    void  killBlock() { isActive = false; };
+    bool  checkIfLegalDir();
 };
 
 #endif

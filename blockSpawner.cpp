@@ -17,12 +17,13 @@ void Blockspawner::compileBlockShader() {
 void Blockspawner::newBlock() {
     std::vector<float> floatVec;
     currentblockNum++;
+    if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); };
     isActive = true;
     blockList.push_back(floatVec);
     int bType = createRandomBlock();
     switch (bType)
     {
-    case 0: genCube();   break;
+    case 0: genCube(0,4,9);   break;
     case 1: genLblock(); break;
     case 2: genZblock(); break;
     case 3: genTblock(); break;
@@ -32,31 +33,47 @@ void Blockspawner::newBlock() {
 };
 
 int Blockspawner::createRandomBlock() {
-        time_t t;
-        srand((unsigned)time(&t));
-        int randType = (rand() % 4);        
-        //UNTILL FURHTER ADO THIS DONT DO SHIT
-
-        return 0;
+    time_t t;
+    srand((unsigned)time(&t));
+    int randType = (rand() % 4);
+    return randType;
 };
 
-void Blockspawner::drawBlocks() {
-    auto blockVAO = compileVertices();
+void Blockspawner::drawActiveBlocks() {
+    liveBlockVAO = compileVertices();
     
     GLuint btexAttrib = glGetAttribLocation(blockShader, "bTexcoord");
     glEnableVertexAttribArray(btexAttrib);
     glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
-    auto blockVertexColorLocation = glGetUniformLocation(blockShader, "u_Color");
     auto blockTextureLocation     = glGetUniformLocation(blockShader, "u_BlockTexture");
 
     glUseProgram(blockShader);
+    bCamHolder->applycamera(blockShader, width, height);
+    glBindVertexArray(liveBlockVAO);
     glUniform1i(blockTextureLocation, 1);
-    bCamHolder->applycamera(blockShader, 5, 5);
-    glBindVertexArray(blockVAO);
-    glUniform4f(blockVertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-    glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, (const void*)0);
-    CleanVAO(blockVAO);
+    glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)0);
+    CleanVAO(liveBlockVAO);
+}
+
+void Blockspawner::drawDeadBlocks() {
+
+    GLuint btexAttrib = glGetAttribLocation(blockShader, "bTexcoord");
+    glEnableVertexAttribArray(btexAttrib);
+    glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+
+    auto blockTextureLocation = glGetUniformLocation(blockShader, "u_BlockTexture");
+
+    glUseProgram(blockShader);
+    bCamHolder->applycamera(blockShader, width, height);
+    glBindVertexArray(deadBlockVAO);
+    int drawOffset = 0;
+    for (int layer = 0; layer < currentblockNum; layer++) {
+        printf("Wild Wild West Textures: %i", int(blockList[layer][2]));
+        glUniform1i(blockTextureLocation, int(blockList[layer][2]));
+        glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)drawOffset);
+        drawOffset += blockList[layer].size();
+    }
 }
 
 /**
@@ -70,20 +87,42 @@ void Blockspawner::drawBlocks() {
  *  @return returns VAO gotten from CreateObject func
  */
 GLuint Blockspawner::compileVertices() {
-    vertices.clear();
+    std::vector<GLfloat> tempVert;
     int stride = 5;
-    for (int i = 0; i < blockList.size(); i++){
-        for (auto& it : blockList[i]) {
-            vertices.push_back(it);
-        }
+    for (auto& it : blockList[currentblockNum]) {
+        tempVert.push_back(it);
     }
-    return CreateObject(&vertices[0], vertices.size() * sizeof(vertices[0]), stride);
+    return CreateObject(&tempVert[0], tempVert.size() * sizeof(tempVert[0]), stride);
 }
 
-void Blockspawner::genCube() {
+/**
+ *  Compiles all Pellet verticie lists into a large vector and calls CreateObject
+ *
+ *  @param itObj - which type of object to iterate, here always pellet
+ *
+ *  @see Pellet::getVertCoord(int index);
+ *  @see GLuint CreateObject(GLfloat* object, int size, const int stride);
+ *
+ *  @return returns VAO gotten from CreateObject func
+ */
+GLuint Blockspawner::compileVertices(bool dead) {
+    std::vector<GLfloat> tempVert;
+    if (dead) {
+        int stride = 5;
+        for (int i = 0; i < currentblockNum; i++) {
+            for (auto& it : blockList[currentblockNum]) {
+                tempVert.push_back(it);
+            }
+        }
+        return CreateObject(&tempVert[0], tempVert.size() * sizeof(tempVert[0]), stride);
+    }
+    else return -1;
+}
+
+void Blockspawner::genCube(int x, int y, int z) {
     std::vector<float> tempBasePoints;
     for (int i = 0; i < 3; i++) {
-        float value = (bCamHolder->getCamFloatMapVal(1, 0, 10, i));
+        float value = (bCamHolder->getCamFloatMapVal(x, y, z, i));
         tempBasePoints.push_back(value);
     }
     int loop = 0, rep = 0, face = 0;
@@ -119,27 +158,27 @@ void Blockspawner::genCube() {
         handleBLockTextureCoords(loop);
         loop++;
     }
-    int bop = 0;
-    printf("Begin Cube points print\n");
-    for (auto& it : blockList[currentblockNum]) {
-        if (bop % 5 == 0) { printf("\n");
-        }
-        printf("%f\t",it); 
-        bop++;
-    }
-    printf("End Cube points print\n");
 }
     
 void Blockspawner::genLblock() {
-
+    genCube(0,4,9);
+    genCube(1,4,9);
+    genCube(2,4,9);
+    genCube(2,3,9);
 }
 
 void Blockspawner::genZblock() {
-
+    genCube(0, 4, 9);
+    genCube(1, 4, 9);
+    genCube(1, 3, 9);
+    genCube(2, 3, 9);
 }
 
 void Blockspawner::genTblock() {
-
+    genCube(0, 4, 9);
+    genCube(1, 4, 9);
+    genCube(2, 4, 9);
+    genCube(1, 3, 9);
 }
 
 float Blockspawner::generateBlockCoord(float x, float y, float z, int mod, int loop) {
@@ -180,4 +219,16 @@ void Blockspawner::handleBLockTextureCoords(int loop) {
  */
 void Blockspawner::loadBlockSprite() {
     blockSprite = load_opengl_texture("assets/ghostModelShader.png", 1);
+}
+
+void Blockspawner::updateBlockLerp() {
+    if (isActive) {
+    }
+    else {
+        newBlock();
+    }
+}
+
+bool Blockspawner::checkIfLegalDir() {
+    return true;
 }

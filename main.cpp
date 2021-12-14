@@ -51,7 +51,6 @@ int main(){
     BlockSpawner = new Blockspawner(gGrid->getWHD());
     BlockSpawner->getCameraPointer(cameraAdress);
     BlockSpawner->setXYZshift(XYZshift);
-    BlockSpawner->newBlock();
     printf("Blockloader Loaded\n");
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -78,6 +77,9 @@ int main(){
         lastFrame = currentTime;
         
         gGrid->drawGrid();
+        int newDir = cameraAdress->getNewDesDir();
+        if (newDir != -1) { BlockSpawner->setNewDir(newDir); }
+        BlockSpawner->updateBlockLerp();
         BlockSpawner->drawActiveBlocks();
 
         glfwSwapBuffers(window);

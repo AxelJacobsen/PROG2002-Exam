@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(Pacman)
+project(Block_Out)
 
 find_package(OpenGL REQUIRED)
 
@@ -13,7 +13,7 @@ add_subdirectory(glfw)
 add_subdirectory(glad)
 add_subdirectory(tinyobjloader)
 
-add_executable(Pacman
+add_executable(Block_Out
 	main.cpp
 	shaders/blockShad.h
 	shaders/gridShad.h
@@ -37,7 +37,7 @@ add_executable(Pacman
 	"camera.h"
 	"camera.cpp" )
 
-target_link_libraries(Pacman
+target_link_libraries(Block_Out
 	PRIVATE
 	glad
 	glfw

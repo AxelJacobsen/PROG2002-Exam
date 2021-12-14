@@ -30,12 +30,11 @@ GLFWwindow* initializeWindow() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    auto window = glfwCreateWindow(1000, 1000, "Pacman", nullptr, nullptr);
+    auto window = glfwCreateWindow(1000, 1000, "Block_Out", nullptr, nullptr);
 
     glfwSetWindowAspectRatio(window, 1000, 1000);
 
     glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
@@ -86,11 +85,6 @@ MessageCallback(GLenum source,
 // -----------------------------------------------------------------------------
 // Callback Functions
 // -----------------------------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    //cameraHolder->mouseMoveCamera(xpos, ypos);
-}
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -98,22 +92,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    int currentCardDir = cameraHolder->getCard();
-    int desdir[5] = { 2,9,4,3 };
-
-    switch (currentCardDir) {
-    case 0: desdir[0] = 2; desdir[1] = 4; desdir[2] = 3; desdir[3] = 9; break;  //North
-    case 1: desdir[0] = 9; desdir[1] = 3; desdir[2] = 2; desdir[3] = 4; break;  //East
-    case 2: desdir[0] = 4; desdir[1] = 2; desdir[2] = 9; desdir[3] = 3; break;  //South
-    case 3: desdir[0] = 3; desdir[1] = 9; desdir[2] = 4; desdir[3] = 2; break;  //West
-    }
     if (action == GLFW_PRESS) {
-        //float cameraSpeed = 2.5 * deltaTime;
         switch (key) {
-        case GLFW_KEY_W: cameraHolder->setNewDesDir(desdir[0]);  break;
-        case GLFW_KEY_S: cameraHolder->setNewDesDir(desdir[1]);  break;
-        case GLFW_KEY_A: cameraHolder->setNewDesDir(desdir[2]); break;
-        case GLFW_KEY_D: cameraHolder->setNewDesDir(desdir[3]);  break;
+        case GLFW_KEY_W: cameraHolder->setNewDesDir(2);  break;
+        case GLFW_KEY_S: cameraHolder->setNewDesDir(4);  break;
+        case GLFW_KEY_A: cameraHolder->setNewDesDir(3);  break;
+        case GLFW_KEY_D: cameraHolder->setNewDesDir(9);  break;
         }
     }
 }

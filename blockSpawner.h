@@ -17,7 +17,7 @@
 
 class Blockspawner {
 private:
-    bool    isActive = true,
+    bool    isActive = false,
             run = true;
     float   lerpStart[3],               //Contains start coords of LERP
             lerpStop[3],                //Contains stop  coords of LERP
@@ -50,6 +50,9 @@ public:
         width  = whd[0];
         height = whd[1];
         depth  = whd[2];
+        spatialXYZ =
+                std::vector<std::vector<int>>(width,
+                std::vector<int>(height));
         loadBlockSprite(); 
         compileBlockShader(); 
     };
@@ -80,13 +83,9 @@ public:
     bool  getHeightUpdated() { if (heightUpdated) { heightUpdated = false; 
                                                     return true;  }
                                                     return false; }
-    void setHeight(std::vector<int> WHD) { 
-        width = WHD[0]; height = WHD[1]; depth = WHD[2]; 
-        spatialXYZ = 
-            std::vector<std::vector<int>>(width,
-            std::vector<int>(height));
-    }
-   
+    void  setNewDir(int newDir) { requestedDir = newDir; }
+    void  getLerpCoords();
+    bool  checkIfHitEnd();
 };  
 
 #endif

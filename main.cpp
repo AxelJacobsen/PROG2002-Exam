@@ -76,11 +76,18 @@ int main(){
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
         
+        //printf("Drawing Grid\n");
         gGrid->drawGrid();
+        //printf("Grid drawn\n");
         int newDir = cameraAdress->getNewDesDir();
-        if (newDir != -1) { BlockSpawner->setNewDir(newDir); }
+        if (newDir != -1) { printf("New Dir found %i\n", newDir); BlockSpawner->setNewDir(newDir); }
+
+        //printf("Updating Lerp\n");
         BlockSpawner->updateBlockLerp();
+        //printf("Lerp updated\n");
+        //printf("Drawing Active blocks\n");
         BlockSpawner->drawActiveBlocks();
+        //printf("Blocks drawn\n");
 
         glfwSwapBuffers(window);
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

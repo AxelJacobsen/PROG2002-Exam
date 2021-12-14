@@ -20,10 +20,11 @@ void Blockspawner::newBlock() {
     if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); };
     isActive = true;
     blockList.push_back(floatVec);
+    initializeLerp();
     int bType = createRandomBlock();
     switch (bType)
     {
-    case 0: genCube(0,4,9); break;
+    case 0: genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]); break;
     case 1: genLblock();    break;
     case 2: genZblock();    break;
     case 3: genTblock();    break;
@@ -39,6 +40,15 @@ int Blockspawner::createRandomBlock() {
     return randType;
 };
 
+void Blockspawner::initializeLerp() {
+    lerpStart[0] = spawnPoint[0] * Xshift - 1.0f;
+    lerpStart[1] = spawnPoint[1] * Yshift - 1.0f;
+    lerpStart[2] = spawnPoint[2] * Zshift - 1.0f;
+    lerpStop[0] = lerpStart[0];
+    lerpStop[1] = lerpStart[1];
+    lerpStop[2] = lerpStart[2];
+}
+
 void Blockspawner::drawActiveBlocks() {
     liveBlockVAO = compileVertices();
     
@@ -49,9 +59,11 @@ void Blockspawner::drawActiveBlocks() {
     auto blockTextureLocation     = glGetUniformLocation(blockShader, "u_BlockTexture");
 
     glUseProgram(blockShader);
+    transformBlock();
     bCamHolder->applycamera(blockShader, width, height);
     glBindVertexArray(liveBlockVAO);
     glUniform1i(blockTextureLocation, 1);
+    
     glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)0);
     CleanVAO(liveBlockVAO);
 }
@@ -163,24 +175,24 @@ void Blockspawner::genCube(int x, int y, int z) {
 }
     
 void Blockspawner::genLblock() {
-    genCube(0, 4, 9);
-    genCube(1, 4, 9);
-    genCube(2, 4, 9);
-    genCube(2, 3, 9);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 2, spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 2, spawnPoint[1] - 1, spawnPoint[2]);
 }
 
 void Blockspawner::genZblock() {
-    genCube(0, 4, 9);
-    genCube(1, 4, 9);
-    genCube(1, 3, 9);
-    genCube(2, 3, 9);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 1, spawnPoint[1] - 1, spawnPoint[2]);
+    genCube(spawnPoint[0] + 2, spawnPoint[1] - 1, spawnPoint[2]);
 }
 
 void Blockspawner::genTblock() {
-    genCube(0, 4, 9);
-    genCube(1, 4, 9);
-    genCube(2, 4, 9);
-    genCube(1, 3, 9);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 2, spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0] + 1, spawnPoint[1] - 1, spawnPoint[2]);
 }
 
 float Blockspawner::generateBlockCoord(float x, float y, float z, int mod, int loop) {
@@ -225,7 +237,8 @@ void Blockspawner::loadBlockSprite() {
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
-        if (lerpProg > 1 || lerpProg < 0) { requestChangeDir(); }
+        if (lerpProg > 1 || lerpProg < 0) { if (checkIfHitEnd()) { printf("CrashTest2\n"); killBlock(); } else { requestChangeDir();  //printf("CrashTest4\n");
+        } }
         else if (lerpStart != lerpStop) { lerpProg += lerpStep; }
         if (lerpProg < 0.6f && lerpProg > 0.5f) {
             updateHeight();
@@ -243,7 +256,9 @@ void Blockspawner::requestChangeDir() {
             lerpStart[1] = lerpStop[1];
             lerpStart[2] = lerpStop[2];
             Blockspawner::getLerpCoords();
+            printf("\nNew Coords:\nStar:\n%f\t%f\t%f\nStop:\n%f\t%f\t%f\n", lerpStart[0], lerpStart[1], lerpStart[2], lerpStop[0], lerpStop[1], lerpStop[2]);
             lerpProg = lerpStep / 2.0f;
+            requestedDir = 0;
         }
     }
 }
@@ -261,9 +276,75 @@ void Blockspawner::updateHeight() {
 }
 
 void Blockspawner::getLerpCoords() {
-
+    switch (requestedDir) {
+    case 2: 
+        for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
+            for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
+                if (spatialXYZ[x][y] != 0) {
+                    spatialXYZ[x][y + 1] = spatialXYZ[x][y];
+                    spatialXYZ[x][y] = 0;
+                }
+            }
+        } 
+        lerpStop[1] = lerpStart[1] -= Yshift; 
+        break;     //UP
+    case 4: 
+        for (int x = 0; x < spatialXYZ.size(); x++) {
+            for (int y = 0; y < spatialXYZ[x].size(); y++) {
+                if (spatialXYZ[x][y] != 0) {
+                    spatialXYZ[x][y - 1] = spatialXYZ[x][y];
+                    spatialXYZ[x][y] = 0;
+                }
+            }
+        } 
+        lerpStop[1] = lerpStart[1] -= Yshift; 
+        break;     //DOWN
+    case 3:     
+        for (int x = 0; x < spatialXYZ.size(); x++) {
+            for (int y = 0; y < spatialXYZ[x].size(); y++) {
+                if (spatialXYZ[x][y] != 0) {
+                    spatialXYZ[x - 1][y] = spatialXYZ[x][y];
+                    spatialXYZ[x][y] = 0;
+                }
+            }
+        } 
+        lerpStop[0] = lerpStart[0] -= Xshift; 
+        break;     //LEFT
+    case 9: 
+        for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
+            for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
+                if (spatialXYZ[x][y] != 0) {
+                    spatialXYZ[x + 1][y] = spatialXYZ[x][y];
+                    spatialXYZ[x][y] = 0;
+                }
+            }
+        } 
+        lerpStop[0] = lerpStart[0] += Xshift;
+        break;     //Right
+    default: break;
+    }
 }
 
-void Blockspawner::checkIfHitEnd() {
+bool Blockspawner::checkIfHitEnd() {
+    return false;
+}
 
+/**
+*  Performs shader transformation for Pacman
+*
+*  @param shaderprogram - pacmans shaderprogram
+*  @param lerpProg      - current pacman lerpprog
+*  @param lerpStart     - pacman lerpstartXY
+*  @param lerpStop      - pacman lerpstopXY
+*/
+void Blockspawner::transformBlock() {
+    float newX = (((1 - lerpProg) * lerpStart[0]) + (lerpProg * lerpStop[0]));
+    float newY = (((1 - lerpProg) * lerpStart[1]) + (lerpProg * lerpStop[1]));
+    float newZ = (((1 - lerpProg) * lerpStart[2]) + (lerpProg * lerpStop[2]));
+
+    //LERP performed in the shader for the pacman object
+    glm::mat4 translation = glm::translate(glm::mat4(1), glm::vec3(newX, newY, newZ));
+    GLuint transformationmat = glGetUniformLocation(blockShader, "u_TransformationMat");
+
+    glUniformMatrix4fv(transformationmat, 1, false, glm::value_ptr(translation));
 }

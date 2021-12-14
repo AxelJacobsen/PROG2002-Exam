@@ -16,10 +16,13 @@ uniform mat4 projection;
 /** Outputs */
 out vec2 vsTexcoord;
 
+/** Uniform */
+layout(location=0) uniform mat4 u_TransformationMat = mat4(1);
+
 void main()
 {
 vsTexcoord = bTexcoord;
-gl_Position = projection * view * vec4(bPosition, 1.0f);
+gl_Position = u_TransformationMat * projection * view * vec4(bPosition, 1.0f);
 }
 )";
 

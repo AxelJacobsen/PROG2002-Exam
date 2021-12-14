@@ -138,10 +138,6 @@ void Grid::fillGridCoords() {
                 gridContF[x][y][z][0] = (Xshift * x)-1.0f;
                 gridContF[x][y][z][1] = (Yshift * y)-1.0f;
                 gridContF[x][y][z][2] = (Zshift * z)-1.0f;
-                for (int test = 0; test < 3; test++) {
-                    printf("%f\t", gridContF[x][y][z][test]);
-                }
-                printf("\n");
             }
         }
     }

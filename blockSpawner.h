@@ -30,7 +30,8 @@ private:
 
     int     currentblockNum = -1,
             width, height, depth,
-            requestedDir = 1;
+            requestedDir = 1,
+            spawnPoint[3] = { 0, 4, 9 };
 
     bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
     bool    heightUpdated = true;
@@ -41,7 +42,7 @@ private:
             blockSprite;
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
-    std::vector<std::vector<int>>blockIntList; //HoldsXYZints of all blocks
+   // std::vector<std::vector<int>> blockIntList; //HoldsXYZints of all blocks
     std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
 
     Camera* bCamHolder;
@@ -86,6 +87,8 @@ public:
     void  setNewDir(int newDir) { requestedDir = newDir; }
     void  getLerpCoords();
     bool  checkIfHitEnd();
+    void  transformBlock();
+    void  initializeLerp();
 };  
 
 #endif

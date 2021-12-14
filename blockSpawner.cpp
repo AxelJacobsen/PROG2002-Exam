@@ -119,7 +119,7 @@ GLuint Blockspawner::compileVertices(bool dead) {
 }
 
 void Blockspawner::genCube(int x, int y, int z) {
-    spatialXYZ[x][y] = z;
+    spatialXYZ[spatialXYZ.size()-1-y][x] = z;
     std::vector<float> tempBasePoints;
     for (int i = 0; i < 3; i++) {
         float value = (bCamHolder->getCamFloatMapVal(x, y, z, i));
@@ -224,15 +224,16 @@ void Blockspawner::loadBlockSprite() {
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
-        if (lerpProg > 1 || lerpProg < 0) {
+        if (lerpProg >= 1.0f || lerpProg <= 0.0f) {
+            lerpProg = 1.0f;
             int newDir = bCamHolder->getNewDesDir();
             if (newDir != -1) { printf("New Dir found %i\n", newDir); setNewDir(newDir); }
             if (checkIfHitEnd()) { killBlock(); } 
             else { requestChangeDir();
         } }
-        else if (lerpStart != lerpStop){ printf("LERPING ASD FUCK RIGHT NOW\n%f\n", lerpProg); lerpProg += lerpStep; }
+        else if (lerpStart != lerpStop){ ;lerpProg += lerpStep; }
         if (lerpProg < 0.6f && lerpProg > 0.5f) {
-            updateHeight();
+            //updateHeight();
         }
     }
     else {
@@ -247,7 +248,6 @@ void Blockspawner::requestChangeDir() {
             lerpStart[1] = lerpStop[1];
             lerpStart[2] = lerpStop[2];
             Blockspawner::getLerpCoords();
-            printf("\nNew Coords:\nStar:\n%f\t%f\t%f\nStop:\n%f\t%f\t%f\n", lerpStart[0], lerpStart[1], lerpStart[2], lerpStop[0], lerpStop[1], lerpStop[2]);
             lerpProg = lerpStep / 2.0f;
             requestedDir = 0;
         }
@@ -277,7 +277,7 @@ void Blockspawner::getLerpCoords() {
                 }
             }
         } 
-        lerpStop[1] = lerpStart[1] += Yshift; 
+        lerpStop[1] = lerpStart[1] + Yshift; 
         break;     //UP
     case 4: 
         for (int x = 0; x < spatialXYZ.size(); x++) {
@@ -288,7 +288,7 @@ void Blockspawner::getLerpCoords() {
                 }
             }
         } 
-        lerpStop[1] = lerpStart[1] -= Yshift; 
+        lerpStop[1] = lerpStart[1] - Yshift; 
         break;     //DOWN
     case 3:     
         for (int x = 0; x < spatialXYZ.size(); x++) {
@@ -299,7 +299,7 @@ void Blockspawner::getLerpCoords() {
                 }
             }
         } 
-        lerpStop[0] = lerpStart[0] -= Xshift; 
+        lerpStop[0] = lerpStart[0] - Xshift; 
         break;     //LEFT
     case 9: 
         for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
@@ -310,9 +310,15 @@ void Blockspawner::getLerpCoords() {
                 }
             }
         } 
-        lerpStop[0] = lerpStart[0] += Xshift;
+        lerpStop[0] = lerpStart[0] + Xshift;
         break;     //Right
     default: break;
+    }
+    for (int x = 0; x < spatialXYZ.size(); x++) {
+        for (int y = 0; y < spatialXYZ[x].size(); y++) {
+            printf("%i ", spatialXYZ[x][y]);
+        }
+        printf("\n");
     }
 }
 
@@ -329,11 +335,9 @@ bool Blockspawner::checkIfHitEnd() {
 *  @param lerpStop      - pacman lerpstopXY
 */
 void Blockspawner::transformBlock() {
-    float newX = (((1 - lerpProg) * lerpStart[0]) + (lerpProg * lerpStop[0]));
-    float newY = (((1 - lerpProg) * lerpStart[1]) + (lerpProg * lerpStop[1]));
-    float newZ = (((1 - lerpProg) * lerpStart[2]) + (lerpProg * lerpStop[2]));
-
-    //LERP performed in the shader for the pacman object
+    float newX = (((1.0f - lerpProg) * lerpStart[0]) + (lerpProg * lerpStop[0]));
+    float newY = (((1.0f - lerpProg) * lerpStart[1]) + (lerpProg * lerpStop[1]));
+    float newZ = (((1.0f - lerpProg) * lerpStart[2]) + (lerpProg * lerpStop[2]));
     glm::mat4 translation = glm::translate(glm::mat4(1), glm::vec3(newX, newY, newZ));
     GLuint transformationmat = glGetUniformLocation(blockShader, "u_TransformationMat");
 

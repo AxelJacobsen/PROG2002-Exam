@@ -94,10 +94,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (action == GLFW_PRESS) {
         switch (key) {
-        case GLFW_KEY_W: cameraHolder->setNewDesDir(2);  break;
-        case GLFW_KEY_S: cameraHolder->setNewDesDir(4);  break;
-        case GLFW_KEY_A: cameraHolder->setNewDesDir(3);  break;
-        case GLFW_KEY_D: cameraHolder->setNewDesDir(9);  break;
+        case GLFW_KEY_UP:    cameraHolder->setNewDesDir(2);  break;
+        case GLFW_KEY_DOWN:  cameraHolder->setNewDesDir(4);  break;
+        case GLFW_KEY_LEFT:  cameraHolder->setNewDesDir(3);  break;
+        case GLFW_KEY_RIGHT: cameraHolder->setNewDesDir(9);  break;
         }
     }
 }

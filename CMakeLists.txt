@@ -17,12 +17,10 @@ add_executable(Block_Out
 	main.cpp
 	shaders/blockShad.h
 	shaders/gridShad.h
-    shaders/ghostShad.h
-	shaders/modelShader.h
+    
+	
 	
 	include/glutil.h
-	"character.h"
-	"character.cpp"
 	"grid.h" 
 	"grid.cpp"
 	"include.h"
@@ -30,8 +28,6 @@ add_executable(Block_Out
 	"globFunc.cpp"
 	"initialize.h"
 	"initialize.cpp"
-	"ghost.h"
-	"ghost.cpp"
 	"blockSpawner.h"
 	"blockSpawner.cpp"
 	"camera.h"

@@ -28,9 +28,6 @@ int main(){
     //Container definition
     Grid* gGrid;
     Blockspawner* BlockSpawner;
-    //std::vector<Pacman*>    Pacmans;    ///< Contains only pacman, done for ease of use
-    //std::vector<Ghost*>     Ghosts;     ///< Contains ghosts
-    //std::vector<Pellet*>    Pellets;    ///< Contains All pellets
     Camera* cameraAdress = new Camera();
 
     // Creates coordinates for map
@@ -61,7 +58,7 @@ int main(){
     float frequency = currentTime;
     float deltaTime = 0.0f;	// time between current frame and last frame
     float lastFrame = 0.0f;
-    float delay     = 0.015f;
+    float delay     = 0.005f;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
@@ -75,12 +72,12 @@ int main(){
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
-        
+        if (BlockSpawner->isRun(false)){
         //printf("Drawing Grid\n");
         gGrid->drawGrid();
         //printf("Grid drawn\n");
         
-        if ((currentTime > (frequency + delay) && BlockSpawner->isRun(false)) || first) {
+        if ((currentTime > (frequency + delay)) || first) {
             first = false;
             //printf("Updating Lerp\n");
             BlockSpawner->updateBlockLerp();
@@ -95,6 +92,7 @@ int main(){
         
 
         glfwSwapBuffers(window);
+        }
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             break;
         }

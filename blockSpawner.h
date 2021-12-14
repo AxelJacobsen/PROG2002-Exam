@@ -21,7 +21,7 @@ private:
             run = true;
     float   lerpStart[3]{0},               //Contains start coords of LERP
             lerpStop[3]{0},                //Contains stop  coords of LERP
-            speedDiv = 20.0f,           //Higher number = slower speed
+            speedDiv = 10.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
             lerpProg = lerpStep,        //defines progress as step to avoid hickups
             Xshift = 0.0f, 
@@ -31,7 +31,7 @@ private:
     int     currentblockNum = -1,
             width, height, depth,
             requestedDir = 1,
-            spawnPoint[3] = { 0, 1, 9 };
+            spawnPoint[3] = { 0, 4, 9 };
 
     bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
     bool    heightUpdated = true;

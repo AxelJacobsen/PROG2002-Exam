@@ -10,9 +10,7 @@
 
  //Shader Inclusion
 #include "shaders/gridShad.h"
-#include "shaders/ghostShad.h"
 #include "shaders/blockShad.h"
-#include "shaders/modelShader.h"
 
  //Library Inclusion
 #include <glad/glad.h>

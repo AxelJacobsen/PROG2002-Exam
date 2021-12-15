@@ -5,20 +5,23 @@
 #include "blockSpawner.h"
 
 
-void Blockspawner::compileBlockShader() {
+void Blockspawner::compileActiveBlockShader() {
     activeBlockShader = CompileShader(blockVertexShaderSrc,
                                       blockFragmentShaderSrc);
-
-    deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
-                                    deadBlockFragmentShaderSrc);
 
     GLint bposAttrib = glGetAttribLocation(activeBlockShader, "bPosition");
     glEnableVertexAttribArray(bposAttrib);
     glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+}
+
+void Blockspawner::compileDeadBlockShader() {
+    deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
+                                    deadBlockFragmentShaderSrc);
 
     GLint dbposAttrib = glGetAttribLocation(activeBlockShader, "dbPosition");
     glEnableVertexAttribArray(dbposAttrib);
-    glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    
 }
 
 void Blockspawner::newBlock() {
@@ -48,38 +51,34 @@ int Blockspawner::createRandomBlock() {
 };
 
 void Blockspawner::drawActiveBlocks() {
-    GLuint btexAttrib = glGetAttribLocation(activeBlockShader, "btext");
-    glEnableVertexAttribArray(btexAttrib);
-    glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
-    auto blockTextureLocation = glGetUniformLocation(activeBlockShader, "u_BlockTexture");
-
+    auto activeBlockColorLocation = glGetUniformLocation(activeBlockShader, "u_Color");
     glUseProgram(activeBlockShader);
     bCamHolder->applycamera(activeBlockShader, width, height);
     transformBlock();
     glBindVertexArray(liveBlockVAO);
-    glUniform1i(blockTextureLocation, 0);
+    glUniform4f(activeBlockColorLocation, 0.2f, 0.2f, 1.0f, 1.0f);
+    glLineWidth(3);
     glDrawElements(GL_LINES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)0);
+    glLineWidth(1);
 }
 
 void Blockspawner::drawDeadBlocks() {
-    GLuint dbtexAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
-    glEnableVertexAttribArray(dbtexAttrib);
-    glVertexAttribPointer(dbtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    GLuint dbcolorAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
+    glEnableVertexAttribArray(dbcolorAttrib);
+    glVertexAttribPointer(dbcolorAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
-    auto deadBlockTextureLocation = glGetUniformLocation(deadBlockShader, "u_deadBlockTexture");
-    auto deadBlockColorLocation = glGetUniformLocation(deadBlockShader, "u_Color");
-
+    if (deadBlockShader == -1) { compileDeadBlockShader(); }
+    
     glUseProgram(deadBlockShader);
     bCamHolder->applycamera(deadBlockShader, width, height);
     glBindVertexArray(deadBlockVAO);
-    int drawOffset = 0;
+    int drawSize = 0;
     for (int layer = 0; layer < currentblockNum; layer++) {
-        glUniform1i(deadBlockTextureLocation, 1);
-        glUniform4f(deadBlockColorLocation, abs(blockList[layer][2]), abs(blockList[layer][2]), abs(blockList[layer][2]), 1.0f);
-        glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)drawOffset);
-        drawOffset += blockList[layer].size();
+        drawSize += blockList[layer].size();
     }
+    glDrawElements(GL_TRIANGLES, drawSize, GL_UNSIGNED_INT, (const void*)0);
+        
+    
 }
 
 /**
@@ -94,7 +93,7 @@ void Blockspawner::drawDeadBlocks() {
  */
 GLuint Blockspawner::compileVertices() {
     std::vector<GLfloat> tempVert;
-    int stride = 5;
+    int stride = 6;
     for (auto& it : blockList[currentblockNum]) {
         tempVert.push_back(it);
     }
@@ -114,7 +113,7 @@ GLuint Blockspawner::compileVertices() {
 GLuint Blockspawner::compileVertices(bool dead) {
     std::vector<GLfloat> tempVert;
     if (dead) {
-        int stride = 5;
+        int stride = 6;
         for (int i = 0; i < currentblockNum; i++) {
             for (auto& it : blockList[i]) {
                 tempVert.push_back(it);
@@ -162,10 +161,21 @@ void Blockspawner::genCube(int x, int y, int z) {
                     tempBasePoints[2], hList[loop], rep));
             rep++;
         }
-        handleBLockTextureCoords(loop);
+        //Color coords, arent used untill dead
+        blockList[currentblockNum].push_back(0.0f);
+        blockList[currentblockNum].push_back(0.0f);
+        blockList[currentblockNum].push_back(0.0f);
         loop++;
     }
+}
 
+void Blockspawner::printBlockLContent(int desLayer) {
+    int spacer = 1;
+    for (auto& it : blockList[desLayer]) {
+        printf("%f\t", it);
+        if (spacer % 6 == 0) { printf("\n"); }
+        spacer++;
+    }
 }
 
 void Blockspawner::genLblock() {
@@ -205,20 +215,7 @@ float Blockspawner::generateBlockCoord(float x, float y, float z, int mod, int l
     case 10:  return y;            // Top Right
     default:  return (float(z) + (Zshift * mod));
     }
-}
-
-void Blockspawner::handleBLockTextureCoords(int loop) {
-    std::pair <int, int> temp = { 0,0 };
-    switch (loop) {
-    case 0:                     break;
-    case 3:  temp.first = 1;    break;
-    case 1:  temp.second = 1;   break;
-    case 2:  temp = { 1, 1 };   break;
-    default: temp = { -1,-1 };  break;
-    }
-    blockList[currentblockNum].push_back(temp.first);
-    blockList[currentblockNum].push_back(temp.second);
-}
+} 
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {
@@ -401,7 +398,7 @@ void Blockspawner::killBlock() {
     std::vector<float> finalizeLerp = performLerp();
     isActive = false;
     int coordTracker = 1, counter = 0;
-    for (int i = 0; i < blockList[currentblockNum].size(); i += 5) {
+    for (int i = 0; i < blockList[currentblockNum].size(); i += 6) {
         for (int o = 0; o < 3; o++) {
             blockList[currentblockNum][(i + o)] += (finalizeLerp[o]);
         }
@@ -418,8 +415,18 @@ void Blockspawner::killBlock() {
             }
         }
     }
-
-    //bCamHolder->printCamIntMap();
+    for (int k = 0; k < blockList[currentblockNum].size(); k += (6*8)) {
+        float activeZColor = blockList[currentblockNum][k + 2];
+        std::vector<float> newColors = getColorsWithFloat(activeZColor);
+        for (int j = k; j < (k + (6*8)); j+=6) { 
+            int colorIt = 0;
+            for (int h = (j + 3); h < (j + 6); h++) {
+                blockList[currentblockNum][h] = newColors[colorIt];
+                colorIt++;
+            }
+        }
+    }
+    bCamHolder->printCamIntMap();
 
     lerpStart[0] = 0; lerpStop[0] = 0;
     lerpStart[1] = 0; lerpStop[1] = 0;
@@ -433,3 +440,19 @@ void Blockspawner::killBlock() {
         }
     }
 };
+
+std::vector<float> Blockspawner::getColorsWithFloat(float colorDepth) {
+    switch (int(colorDepth * 10.0f)) {
+    case -10: {std::vector<float> tempColors{ 0.9f,0.0f,0.0f }; return tempColors; } break;
+    case -8:  {std::vector<float> tempColors{ 0.5f,0.5f,0.0f }; return tempColors; } break;
+    case -6:  {std::vector<float> tempColors{ 0.0f,0.9f,0.0f }; return tempColors; } break;
+    case -3:  {std::vector<float> tempColors{ 0.0f,0.5f,0.5f }; return tempColors; } break;
+    case -1:  {std::vector<float> tempColors{ 0.0f,0.0f,0.9f }; return tempColors; } break;
+    case  0:  {std::vector<float> tempColors{ 0.0f,0.9f,0.9f }; return tempColors; } break;
+    case  2:  {std::vector<float> tempColors{ 0.9f,0.9f,0.9f }; return tempColors; } break;
+    case  4:  {std::vector<float> tempColors{ 0.9f,0.0f,0.9f }; return tempColors; } break;
+    case  6:  {std::vector<float> tempColors{ 0.9f,0.9f,0.0f }; return tempColors; } break;
+    case  8:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    default: printf("Couldnt find coords\n"); {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    }
+}

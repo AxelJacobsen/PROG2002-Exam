@@ -30,7 +30,7 @@ add_executable(Block_Out
 	"blockSpawner.h"
 	"blockSpawner.cpp"
 	"camera.h"
-	"camera.cpp"   "blockSpawner (2).cpp" "shaders/deadBlockShad.h" "shaders/blockShad (2).h")
+	"camera.cpp"    "shaders/deadBlockShad.h" )
 
 target_link_libraries(Block_Out
 	PRIVATE

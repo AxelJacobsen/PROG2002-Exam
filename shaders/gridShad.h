@@ -50,8 +50,3 @@ else {color = textColorG;}
 
 
 #endif // __GRIDSHAD_H_
-
-/*
-
-
-*/

@@ -41,10 +41,8 @@ private:
 
     GLuint  liveBlockVAO,
             deadBlockVAO,
-            activeBlockShader,
-            deadBlockShader,
-            blockSprite,
-            deadBlockSprites[10];
+            activeBlockShader = -1,
+            deadBlockShader   = -1;
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
     std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
@@ -58,7 +56,7 @@ public:
         spatialXYZ =
                 std::vector<std::vector<int>>(width,
                 std::vector<int>(height));
-        compileBlockShader(); 
+        compileActiveBlockShader();
     };
     ~Blockspawner() {};
 
@@ -68,7 +66,8 @@ public:
     void drawDeadBlocks();
     GLuint compileVertices();
     GLuint compileVertices(bool dead);
-    void compileBlockShader();
+    void compileActiveBlockShader();
+    void compileDeadBlockShader();
 
     void  genCube(int x, int y, int z);
     void  genLblock();
@@ -89,6 +88,7 @@ public:
                                                     return false; }
     void  setNewDir(int newDir) { requestedDir = newDir; }
     bool  getLerpCoords();
+    int   getCurrentBlock() { return currentblockNum; };
     bool  checkIfHitEnd();
     void  transformBlock();
     void  initializeLerp();
@@ -96,6 +96,7 @@ public:
     bool  checkForQueue() { return queuedHeightDrop; }
     std::vector<float> performLerp();
     std::vector<float> getColorsWithFloat(float colorDepth);
+    void printBlockLContent(int desLayer);
 };  
 
 #endif

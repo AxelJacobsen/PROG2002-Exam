@@ -1,5 +1,5 @@
-#ifndef __BEADBLOCKSHAD_H_
-#define __BEADBLOCKSHAD_H_
+#ifndef __DEADBLOCKSHAD_H_
+#define __DEADBLOCKSHAD_H_
 
 #include <string>
 
@@ -18,7 +18,7 @@ out vec3 vsColors;
 
 void main()
 {
-vsColors   = dbColor;
+vsColors    =  dbColor;
 gl_Position =  projection * view * vec4(dbPosition, 1.0f);
 }
 )";
@@ -34,8 +34,8 @@ out vec4 color;
 
 void main()
 {
-	color = vec4(vsColors, 1.0f);
+	color = vec4(0.5f,0.5f,0.5f, 1.0f);
 }
 )";
 
-#endif // __BEADBLOCKSHAD_H_
+#endif // __DEADBLOCKSHAD_H_

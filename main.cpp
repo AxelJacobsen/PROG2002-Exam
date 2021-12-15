@@ -83,7 +83,7 @@ int main(){
             frequency = currentTime;
             if (initialDelay == 0){
                 if (dropDelay == 0) {
-                    dropDelay = 50;
+                    dropDelay = 5;
                     BlockSpawner->updateHeight();
                 }
                 else if (!BlockSpawner->checkForQueue()) { dropDelay--; }
@@ -92,7 +92,10 @@ int main(){
 
         }
         BlockSpawner->drawActiveBlocks();
-        BlockSpawner->drawDeadBlocks();
+        if (0 < BlockSpawner->getCurrentBlock()) {
+            BlockSpawner->drawDeadBlocks();
+        }
+       
         
 
         glfwSwapBuffers(window);

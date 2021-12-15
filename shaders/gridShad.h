@@ -42,7 +42,7 @@ void main()
 {
 vec4 textColorG = texture(u_gridTexture, gridTexcoord);
 if (0.5f < boolText){
-	color = textColorG;
+	color = textColorG * u_Color;
 } else if (boolText < 1.0f){color = u_Color;}
 else {color = textColorG;}
 }

@@ -1,2 +1,6 @@
 * Textures:
 All textures used are from the video game minecraft
+
+* Teacher functions:
+Most of the functions in globFunc.cpp are functions that the teacher has given us, though i believe almost all are
+slightly altered to suit my program.

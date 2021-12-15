@@ -100,6 +100,13 @@ public:
     std::vector<float> getColorsWithFloat(float colorDepth);
     void printBlockLContent(int desLayer);
     void loadBlockSprite();
+    void cleanBlockSpawner() {
+        glDeleteProgram(activeBlockShader);
+        glDeleteProgram(deadBlockShader);
+        glDeleteTextures(1, &blockSprite);
+        CleanVAO(liveBlockVAO);
+        CleanVAO(deadBlockVAO);
+    }
 };  
 
 #endif

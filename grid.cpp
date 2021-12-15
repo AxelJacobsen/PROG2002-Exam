@@ -249,7 +249,7 @@ void Grid::cleanGrid() {
     CleanVAO(gridVAO);
 }
 
-/**
+/** 
  *  Draws map
  *
  *  @param shader - shaderprogram to use for drawing
@@ -266,6 +266,7 @@ void Grid::drawGrid() {
     glUniform1i(gridTextureLocation, 0);
     gCamHolder->applycamera(gridShaderProgram, width, height);
     glBindVertexArray(gridTextureVAO);
+    glUniform4f(gridVertexColorLocation, 0.7f, 0.7f, 0.7f, 1.0f);
     glUniform1f(gridIsTextured, 1.0f);
     glDrawElements(GL_TRIANGLES, gridFwText.size(), GL_UNSIGNED_INT, (const void*)0);
     

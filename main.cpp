@@ -60,7 +60,7 @@ int main(){
         delay     = 0.005f;
     int   dropDelay = 10,
         activeDropDelay = dropDelay,
-        initialDelay = dropDelay;//*20;
+        initialDelay = dropDelay*10;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
@@ -85,7 +85,7 @@ int main(){
             bool spacePressed = cameraAdress->updateSpace(false);
             if (initialDelay == 0){
                 if (activeDropDelay == 0) {
-                    if (spacePressed) { activeDropDelay = 1; } 
+                    if (spacePressed) { activeDropDelay = 1; }
                     else {
                         activeDropDelay = dropDelay;
                     }
@@ -124,7 +124,10 @@ int main(){
 
     glUseProgram(0);
     gGrid->cleanGrid();
+    BlockSpawner->cleanBlockSpawner();
     delete(gGrid);
+    delete(BlockSpawner);
+    delete(cameraAdress);
     glfwTerminate();
 
     return EXIT_SUCCESS;

@@ -95,14 +95,7 @@ void Blockspawner::drawDeadBlocks() {
 }
 
 /**
- *  Compiles all Pellet verticie lists into a large vector and calls CreateObject
- *
- *  @param itObj - which type of object to iterate, here always pellet
- *
- *  @see Pellet::getVertCoord(int index);
- *  @see GLuint CreateObject(GLfloat* object, int size, const int stride);
- *
- *  @return returns VAO gotten from CreateObject func
+ * 
  */
 GLuint Blockspawner::compileVertices() {
     std::vector<GLfloat> tempVert;
@@ -295,35 +288,44 @@ void Blockspawner::requestChangeDir() {
 }
 
 void Blockspawner::updateHeight(bool space) {
-    bool update = true;
+    bool update = true,
+         noHit = true;
+    std::vector<int> displaceVect;
     int xDep = 0;
     for (auto& xIt : spatialXYZ) {
         int yDep = 0;
         for (auto& yIt : xIt) {
             if (yIt != 0) {
-                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt - 1) == 0) {
-                    yIt--;
-                    if (yIt == 0) {
-                        yIt--;
+                if (0 <= yIt - 1) {
+                    if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt - 1) == 0) {
+                        displaceVect.push_back(xDep);
+                        displaceVect.push_back(yDep);
+                    }
+                    else {
+                        if (yIt == (depth - 1)) {
+                            if (failDelay) { run = false; printf("\n\n\nGame Over\n\n\n"); }
+                            failDelay = true;
+                        }
                         update = false;
                     }
                 }
-                else {
-                    if (yIt == (depth - 1)) {
-                        if (failDelay) { run = false; printf("\n\n\nGame Over\n\n\n"); }
-                        failDelay = true;
-                    }
-                    update = false;
-                }
+                else { update = false; }
             }
             yDep++;
         }
         xDep++;
     }
+
     lerpStart[2] = lerpStop[2];
     lerpStop[2] -= Zshift;
     heightLerp = 0.0f;
     if (update) {
+        for (int g = 0; g < displaceVect.size(); g += 2) {
+            spatialXYZ[displaceVect[g]][displaceVect[g + 1]]--;
+            if (spatialXYZ[displaceVect[g]][displaceVect[g + 1]] == 0) {
+                spatialXYZ[displaceVect[g]][displaceVect[g + 1]]--;
+            }
+        }
         queuedHeightDrop = true;
     }
     else { killBlock(); };
@@ -336,9 +338,9 @@ bool Blockspawner::getLerpCoords() {
     case 2:
         for (int x = tempXYZ.size() - 1; 0 <= x; x--) {
             for (int y = tempXYZ[x].size() - 1; 0 <= y; y--) {
-                if (tempXYZ[x][y] != 0) {
+                if (0 < tempXYZ[x][y]) {
                     if ((y + 1) < tempXYZ[x].size()) {
-                        if (bCamHolder->getCamIntMapVal(x, y + 1, (depth - tempXYZ[x][y + 1]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x, y + 1, tempXYZ[x][y]) == 0) {
                             tempXYZ[x][y + 1] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -353,9 +355,9 @@ bool Blockspawner::getLerpCoords() {
     case 4:
         for (int x = 0; x < tempXYZ.size(); x++) {
             for (int y = 0; y < tempXYZ[x].size(); y++) {
-                if (tempXYZ[x][y] != 0) {
+                if (0 < tempXYZ[x][y]) {
                     if (0 <= (y - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x, y - 1, (depth - tempXYZ[x][y - 1]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x, y - 1, tempXYZ[x][y]) == 0) {
                             tempXYZ[x][y - 1] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -370,9 +372,9 @@ bool Blockspawner::getLerpCoords() {
     case 3:
         for (int x = 0; x < spatialXYZ.size(); x++) {
             for (int y = 0; y < spatialXYZ[x].size(); y++) {
-                if (tempXYZ[x][y] != 0) {
+                if (0 < tempXYZ[x][y]) {
                     if (0 <= (x - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x - 1, y, (depth - tempXYZ[x - 1][y]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x - 1, y, tempXYZ[x][y]) == 0) {
                             tempXYZ[x - 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -387,9 +389,9 @@ bool Blockspawner::getLerpCoords() {
     case 9:
         for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
             for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
-                if (tempXYZ[x][y] != 0) {
+                if (0 < tempXYZ[x][y]) {
                     if ((x + 1) < tempXYZ.size()) {
-                        if (bCamHolder->getCamIntMapVal(x + 1, y, (depth - tempXYZ[x + 1][y]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x + 1, y, tempXYZ[x][y]) == 0) {
                             tempXYZ[x + 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -434,7 +436,7 @@ std::vector<float> Blockspawner::performLerp() {
 
 void Blockspawner::killBlock() {
     if (bCamHolder->updateSpace(false)) { bCamHolder->updateSpace(true); }
-    heightLerp = 1.0f;
+    heightLerp = 0.0f;
     std::vector<float> finalizeLerp = performLerp();
     isActive = false;
     int coordTracker = 1, counter = 0;
@@ -491,6 +493,6 @@ std::vector<float> Blockspawner::getColorsWithFloat(float colorDepth) {
     case  4:  {std::vector<float> tempColors{ 0.9f,0.0f,0.9f }; return tempColors; } break;
     case  6:  {std::vector<float> tempColors{ 0.9f,0.9f,0.0f }; return tempColors; } break;
     case  8:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
-    default: printf("Couldnt find coords\n"); {std::vector<float> tempColors{ 1.0f,1.0f,1.0f }; return tempColors; } break;
+    default:  {std::vector<float> tempColors{ 1.0f,1.0f,1.0f }; return tempColors; } break;
     }
 }

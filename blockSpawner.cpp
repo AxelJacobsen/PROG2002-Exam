@@ -268,20 +268,25 @@ void Blockspawner::requestChangeDir() {
 void Blockspawner::updateHeight() {
     bool update = true;
     int xDep = 0;
-    for (auto& xIt : spatialXYZ) { 
+    for (auto& xIt : spatialXYZ) {
         int yDep = 0;
         for (auto& yIt : xIt) { 
             if (yIt != 0){
-                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt) == 0) {
-                    if (0 <= yIt){
+                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt-1) == 0) {
+                    yIt--;
+                    if (yIt == 0) { 
                         yIt--;
-                        if (yIt == 0) { 
-                            yIt--;
-                            update = false; 
-                        } 
-                    }
+                        update = false; 
+                    } 
                 }
-                else { printf("Crashed at X: %i, Y: %i, Z %i\n", xDep, yDep, yIt); update = false; }
+                else { 
+                    printf("Crashed at X: %i, Y: %i, Z %i\n", xDep, yDep, yIt - 1); 
+                    if (yIt == (depth - 1)) { 
+                        if (failDelay) { run = false; printf("\n\n\nGame Over\n\n\n"); } 
+                        failDelay = true;  
+                    } 
+                    update = false; 
+                }
             }
             yDep++;
         } 
@@ -400,6 +405,7 @@ std::vector<float> Blockspawner::performLerp() {
 }
 
 void Blockspawner::killBlock() { 
+    heightLerp = 1.0f;
     std::vector<float> finalizeLerp = performLerp();
     isActive = false; 
     int coordTracker = 1, counter = 0;

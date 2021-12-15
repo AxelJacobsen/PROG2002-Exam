@@ -18,7 +18,8 @@
 class Blockspawner {
 private:
     bool    isActive = false,
-            run = true;
+            run = true,
+            failDelay = false;
     float   lerpStart[3]{0},               //Contains start coords of LERP
             lerpStop[3]{0},                //Contains stop  coords of LERP
             speedDiv = 10.0f,           //Higher number = slower speed

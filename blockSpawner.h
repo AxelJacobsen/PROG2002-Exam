@@ -58,7 +58,6 @@ public:
         spatialXYZ =
                 std::vector<std::vector<int>>(width,
                 std::vector<int>(height));
-        loadBlockSprite(); 
         compileBlockShader(); 
     };
     ~Blockspawner() {};
@@ -79,7 +78,6 @@ public:
     void  setXYZshift(std::vector<float> XYZshift) { Xshift = XYZshift[0], Yshift = XYZshift[1], Zshift = XYZshift[2]; }
     void  getCameraPointer(Camera* newCamera) { bCamHolder = newCamera; };
     void  handleBLockTextureCoords(int loop);
-    void  loadBlockSprite();
     void  updateBlockLerp();
     void  updateBlockDepthLerp();
     void  killBlock();

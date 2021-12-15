@@ -1,24 +1,28 @@
 // -----------------------------------------------------------------------------
 // Class function definition
 // -----------------------------------------------------------------------------
-
+/*
 #include "blockSpawner.h"
 
 
 void Blockspawner::compileBlockShader() {
     activeBlockShader = CompileShader(blockVertexShaderSrc,
-                                      blockFragmentShaderSrc);
-
-    deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
-                                    deadBlockFragmentShaderSrc);
+                                      blockFragmentShaderSrc);    
 
     GLint bposAttrib = glGetAttribLocation(activeBlockShader, "bPosition");
     glEnableVertexAttribArray(bposAttrib);
-    glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    
+    deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
+                                    deadBlockFragmentShaderSrc);
 
-    GLint dbposAttrib = glGetAttribLocation(activeBlockShader, "dbPosition");
+    GLint dbposAttrib = glGetAttribLocation(deadBlockShader, "dbPosition");
     glEnableVertexAttribArray(dbposAttrib);
-    glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+
+    GLint dbColAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
+    glEnableVertexAttribArray(dbposAttrib);
+    glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 }
 
 void Blockspawner::newBlock() {
@@ -48,40 +52,29 @@ int Blockspawner::createRandomBlock() {
 };
 
 void Blockspawner::drawActiveBlocks() {
-    GLuint btexAttrib = glGetAttribLocation(activeBlockShader, "btext");
-    glEnableVertexAttribArray(btexAttrib);
-    glVertexAttribPointer(btexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
-    auto blockTextureLocation = glGetUniformLocation(activeBlockShader, "u_BlockTexture");
-
+    auto activeBlockColorLocation = glGetUniformLocation(activeBlockShader, "u_Color");
     glUseProgram(activeBlockShader);
     bCamHolder->applycamera(activeBlockShader, width, height);
     transformBlock();
     glBindVertexArray(liveBlockVAO);
-    glUniform1i(blockTextureLocation, 0);
+    glUniform4f(activeBlockColorLocation, 0.2f, 0.2f, 1.0f, 1.0f);
+    glLineWidth(3);
     glDrawElements(GL_LINES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)0);
+    glLineWidth(1);
 }
 
 void Blockspawner::drawDeadBlocks() {
-    GLuint dbtexAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
-    glEnableVertexAttribArray(dbtexAttrib);
-    glVertexAttribPointer(dbtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
-    auto deadBlockTextureLocation = glGetUniformLocation(deadBlockShader, "u_deadBlockTexture");
-    auto deadBlockColorLocation = glGetUniformLocation(deadBlockShader, "u_Color");
-
     glUseProgram(deadBlockShader);
     bCamHolder->applycamera(deadBlockShader, width, height);
     glBindVertexArray(deadBlockVAO);
     int drawOffset = 0;
     for (int layer = 0; layer < currentblockNum; layer++) {
-        glUniform1i(deadBlockTextureLocation, 1);
-        glUniform4f(deadBlockColorLocation, abs(blockList[layer][2]), abs(blockList[layer][2]), abs(blockList[layer][2]), 1.0f);
         glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)drawOffset);
+        printf("Offset:\n%i\n", drawOffset);
         drawOffset += blockList[layer].size();
     }
 }
-
+*/
 /**
  *  Compiles all Pellet verticie lists into a large vector and calls CreateObject
  *
@@ -92,15 +85,16 @@ void Blockspawner::drawDeadBlocks() {
  *
  *  @return returns VAO gotten from CreateObject func
  */
+/*
 GLuint Blockspawner::compileVertices() {
     std::vector<GLfloat> tempVert;
-    int stride = 5;
+    int stride = 6;
     for (auto& it : blockList[currentblockNum]) {
         tempVert.push_back(it);
     }
     return CreateObject(&tempVert[0], tempVert.size() * sizeof(tempVert[0]), stride, true);
 }
-
+*/
 /**
  *  Compiles all Pellet verticie lists into a large vector and calls CreateObject
  *
@@ -111,10 +105,11 @@ GLuint Blockspawner::compileVertices() {
  *
  *  @return returns VAO gotten from CreateObject func
  */
+/*
 GLuint Blockspawner::compileVertices(bool dead) {
     std::vector<GLfloat> tempVert;
     if (dead) {
-        int stride = 5;
+        int stride = 6;
         for (int i = 0; i < currentblockNum; i++) {
             for (auto& it : blockList[i]) {
                 tempVert.push_back(it);
@@ -133,11 +128,11 @@ void Blockspawner::genCube(int x, int y, int z) {
         tempBasePoints.push_back(value);
     }
     int loop = 0, rep = 0, face = 0;
-    int pList[4]{ 0 , 3 , 6 , 9 };
-    int hList[4]{ 1 , 1 , 1 , 1 };
-    for (int b = 0; b < 24; b++) {
-        if ((b != 0 && b % 4 == 0)) {
-            loop = 0;
+    int pList[4]  { 0 , 3 , 6 , 9 };
+    int hList[4]  { 1 , 1 , 1 , 1 };
+    for (int b = 0; b < (24); b++) {
+        if ((b != 0 && b % 4 == 0)) { 
+            loop = 0; 
             face++;
             switch (face) {
             case 0: hList[0] = 1; hList[1] = 1; hList[2] = 1; hList[3] = 1; break;  //FRONT
@@ -145,7 +140,7 @@ void Blockspawner::genCube(int x, int y, int z) {
             case 1: hList[0] = 0; hList[1] = 0; hList[2] = 0; hList[3] = 0; break;  //BACK
 
             case 2: pList[0] = 0; pList[1] = 3; pList[2] = 3; pList[3] = 0;         //LEFT
-                hList[0] = 1; hList[1] = 1; hList[2] = 0; hList[3] = 0; break;
+                    hList[0] = 1; hList[1] = 1; hList[2] = 0; hList[3] = 0; break;
 
             case 3: pList[0] = 9; pList[1] = 6; pList[2] = 6; pList[3] = 9; break;  //RIGHT
 
@@ -157,33 +152,36 @@ void Blockspawner::genCube(int x, int y, int z) {
         rep = pList[loop];
         for (int XYZ = 0; XYZ < 3; XYZ++) {
             blockList[currentblockNum].push_back(
-                generateBlockCoord(tempBasePoints[0],
-                    tempBasePoints[1],
-                    tempBasePoints[2], hList[loop], rep));
+            generateBlockCoord( tempBasePoints[0],
+                                tempBasePoints[1],
+                                tempBasePoints[2], hList[loop], rep));
             rep++;
         }
-        handleBLockTextureCoords(loop);
+        //Color coords, arent used untill dead
+        blockList[currentblockNum].push_back(0.0f);
+        blockList[currentblockNum].push_back(0.0f);
+        blockList[currentblockNum].push_back(0.0f);
         loop++;
     }
 
 }
-
+    
 void Blockspawner::genLblock() {
-    genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 2, spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 2, spawnPoint[1] - 1, spawnPoint[2]);
 }
 
 void Blockspawner::genZblock() {
-    genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 1, spawnPoint[1] - 1, spawnPoint[2]);
     genCube(spawnPoint[0] + 2, spawnPoint[1] - 1, spawnPoint[2]);
 }
 
 void Blockspawner::genTblock() {
-    genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]);
+    genCube(spawnPoint[0],     spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 1, spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 2, spawnPoint[1], spawnPoint[2]);
     genCube(spawnPoint[0] + 1, spawnPoint[1] - 1, spawnPoint[2]);
@@ -203,21 +201,8 @@ float Blockspawner::generateBlockCoord(float x, float y, float z, int mod, int l
 
     case 9:   return (x + Xshift); // Top Right
     case 10:  return y;            // Top Right
-    default:  return (float(z) + (Zshift * mod));
+    default:  return (float(z) + (Zshift*mod));
     }
-}
-
-void Blockspawner::handleBLockTextureCoords(int loop) {
-    std::pair <int, int> temp = { 0,0 };
-    switch (loop) {
-    case 0:                     break;
-    case 3:  temp.first = 1;    break;
-    case 1:  temp.second = 1;   break;
-    case 2:  temp = { 1, 1 };   break;
-    default: temp = { -1,-1 };  break;
-    }
-    blockList[currentblockNum].push_back(temp.first);
-    blockList[currentblockNum].push_back(temp.second);
 }
 
 void Blockspawner::updateBlockLerp() {
@@ -226,9 +211,9 @@ void Blockspawner::updateBlockLerp() {
             lerpProg = 1.0f;
             int newDir = bCamHolder->getNewDesDir();
             if (newDir != -1) { setNewDir(newDir); }
-            else { requestChangeDir(); }
+            else { requestChangeDir(); } 
         }
-        else if (lerpStart != lerpStop) { lerpProg += lerpStep; }
+        else if (lerpStart != lerpStop){ lerpProg += lerpStep; }
     }
     else {
         newBlock();
@@ -238,7 +223,7 @@ void Blockspawner::updateBlockLerp() {
 void Blockspawner::updateBlockDepthLerp() {
     if (isActive && queuedHeightDrop) {
         if (heightLerp >= 1.0f || heightLerp < 0.0f) {
-            heightLerp = 1.0f;
+            heightLerp = 1.0f; 
             queuedHeightDrop = false;
         }
         else if (lerpStart != lerpStop) { heightLerp += lerpStep; }
@@ -246,7 +231,7 @@ void Blockspawner::updateBlockDepthLerp() {
 }
 
 void Blockspawner::requestChangeDir() {
-    if (requestedDir != 0) {
+    if(requestedDir != 0){
         lerpStart[0] = lerpStop[0];
         lerpStart[1] = lerpStop[1];
         lerpStart[2] = lerpStop[2];
@@ -262,26 +247,26 @@ void Blockspawner::updateHeight() {
     int xDep = 0;
     for (auto& xIt : spatialXYZ) {
         int yDep = 0;
-        for (auto& yIt : xIt) {
-            if (yIt != 0) {
-                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt - 1) == 0) {
+        for (auto& yIt : xIt) { 
+            if (yIt != 0){
+                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt-1) == 0) {
                     yIt--;
-                    if (yIt == 0) {
+                    if (yIt == 0) { 
                         yIt--;
-                        update = false;
-                    }
+                        update = false; 
+                    } 
                 }
-                else {
-                    printf("Crashed at X: %i, Y: %i, Z %i\n", xDep, yDep, yIt - 1);
-                    if (yIt == (depth - 1)) {
-                        if (failDelay) { run = false; printf("\n\n\nGame Over\n\n\n"); }
-                        failDelay = true;
-                    }
-                    update = false;
+                else { 
+                    printf("Crashed at X: %i, Y: %i, Z %i\n", xDep, yDep, yIt - 1); 
+                    if (yIt == (depth - 1)) { 
+                        if (failDelay) { run = false; printf("\n\n\nGame Over\n\n\n"); } 
+                        failDelay = true;  
+                    } 
+                    update = false; 
                 }
             }
             yDep++;
-        }
+        } 
         xDep++;
     }
     lerpStart[2] = lerpStop[2];
@@ -297,31 +282,31 @@ bool Blockspawner::getLerpCoords() {
     std::vector<std::vector<int>> tempXYZ = spatialXYZ;
     bool legalmove = true;
     switch (requestedDir) {
-    case 2:
+    case 2: 
         for (int x = tempXYZ.size() - 1; 0 <= x; x--) {
             for (int y = tempXYZ[x].size() - 1; 0 <= y; y--) {
                 if (tempXYZ[x][y] != 0) {
                     if ((y + 1) < tempXYZ[x].size()) {
-                        if (bCamHolder->getCamIntMapVal(x, y + 1, (depth - tempXYZ[x][y + 1]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x, y + 1, (depth - tempXYZ[x][y + 1]) -1) == 0) {
                             tempXYZ[x][y + 1] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
-                        else { legalmove = false; }
+                        else { legalmove = false; }  
                     }
                     else { legalmove = false; }
                 }
             }
-        }
-        if (legalmove) lerpStop[1] = lerpStart[1] + Yshift;
+        } 
+        if (legalmove) lerpStop[1] = lerpStart[1] + Yshift; 
         break;     //UP
-    case 4:
+    case 4: 
         for (int x = 0; x < tempXYZ.size(); x++) {
             for (int y = 0; y < tempXYZ[x].size(); y++) {
                 if (tempXYZ[x][y] != 0) {
                     if (0 <= (y - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x, y - 1, (depth - tempXYZ[x][y - 1]) - 1) == 0) {
-                            tempXYZ[x][y - 1] = tempXYZ[x][y];
-                            tempXYZ[x][y] = 0;
+                        if (bCamHolder->getCamIntMapVal(x, y - 1, (depth - tempXYZ[x][y - 1]) -1) == 0){
+                        tempXYZ[x][y - 1] = tempXYZ[x][y];
+                        tempXYZ[x][y] = 0;
                         }
                         else { legalmove = false; }
                     }
@@ -331,12 +316,12 @@ bool Blockspawner::getLerpCoords() {
         }
         if (legalmove) lerpStop[1] = lerpStart[1] - Yshift;
         break;     //DOWN
-    case 3:
+    case 3:     
         for (int x = 0; x < spatialXYZ.size(); x++) {
             for (int y = 0; y < spatialXYZ[x].size(); y++) {
                 if (tempXYZ[x][y] != 0) {
                     if (0 <= (x - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x - 1, y, (depth - tempXYZ[x - 1][y]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x - 1, y, (depth - tempXYZ[x - 1][y]) -1) == 0) {
                             tempXYZ[x - 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -345,33 +330,33 @@ bool Blockspawner::getLerpCoords() {
                     else { legalmove = false; }
                 }
             }
-        }
+        } 
         if (legalmove) lerpStop[0] = lerpStart[0] - Xshift;
         break;     //LEFT
-    case 9:
+    case 9: 
         for (int x = spatialXYZ.size() - 1; 0 <= x; x--) {
             for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
                 if (tempXYZ[x][y] != 0) {
                     if ((x + 1) < tempXYZ.size()) {
-                        if (bCamHolder->getCamIntMapVal(x + 1, y, (depth - tempXYZ[x + 1][y]) - 1) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x + 1, y, (depth - tempXYZ[x + 1][y]) -1) == 0) {
                             tempXYZ[x + 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
                         else { legalmove = false; }
                     }
                     else { legalmove = false; }
-                }
+                } 
             }
-        }
+        } 
         if (legalmove) lerpStop[0] = lerpStart[0] + Xshift;
         break;     //Right
     default: break;
     }
-
+    
     if (legalmove) { spatialXYZ = tempXYZ; }
     return legalmove;
 }
-
+*/
 /**
 *  Performs shader transformation for Pacman
 *
@@ -380,6 +365,7 @@ bool Blockspawner::getLerpCoords() {
 *  @param lerpStart     - pacman lerpstartXY
 *  @param lerpStop      - pacman lerpstopXY
 */
+/*
 void Blockspawner::transformBlock() {
     std::vector<float> transformLerpCoords = performLerp();
     glm::mat4 translation = glm::translate(glm::mat4(1), glm::vec3(transformLerpCoords[0], transformLerpCoords[1], transformLerpCoords[2]));
@@ -396,40 +382,60 @@ std::vector<float> Blockspawner::performLerp() {
     return tempLerpHolder;
 }
 
-void Blockspawner::killBlock() {
+void Blockspawner::killBlock() { 
     heightLerp = 1.0f;
     std::vector<float> finalizeLerp = performLerp();
-    isActive = false;
+    isActive = false; 
     int coordTracker = 1, counter = 0;
-    for (int i = 0; i < blockList[currentblockNum].size(); i += 5) {
+    for (int i = 0; i < blockList[currentblockNum].size(); i+=5) {
         for (int o = 0; o < 3; o++) {
             blockList[currentblockNum][(i + o)] += (finalizeLerp[o]);
         }
     }
     for (int p = 0; p < width; p++) {
         for (int l = 0; l < height; l++) {
-            if (spatialXYZ[p][l] != 0) {
-                if (spatialXYZ[p][l] == -1) {
-                    bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l] + 1));
-                }
-                else {
-                    bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]));
+            if (spatialXYZ[p][l] != 0) { if (spatialXYZ[p][l] == -1) { 
+                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]+1)); } 
+            else {
+                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]));
                 }
             }
         }
     }
 
-    //bCamHolder->printCamIntMap();
+    for (int k = 0; k < blockList[currentblockNum].size(); k += (6*6)) {
+        float activeZColor = blockList[currentblockNum][k + 2];
+        std::vector<float> newColors = getColorsWithFloat(activeZColor);
+        for (int j = k; j < (k + (6*6)); j++) {
+            
+        }
+    }
+
+    bCamHolder->printCamIntMap();
 
     lerpStart[0] = 0; lerpStop[0] = 0;
     lerpStart[1] = 0; lerpStop[1] = 0;
     lerpStart[2] = 0; lerpStop[2] = 0;
 
-    for (auto& xIt : spatialXYZ)
-    {
-        for (auto& yIt : xIt)
-        {
-            yIt = 0;
-        }
-    }
+    for (auto& xIt : spatialXYZ) 
+        { for (auto& yIt : xIt) 
+            { yIt = 0; } 
+    } 
 };
+
+
+std::vector<float> Blockspawner::getColorsWithFloat(float colorDepth) {
+    switch (int(colorDepth*10.0f)) {
+    case -10: {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case -8:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case -6:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case -4:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case -2:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  0:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  2:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  4:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  6:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  8:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    case  10: {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    }
+}*/

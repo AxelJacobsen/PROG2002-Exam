@@ -13,8 +13,6 @@
  */
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "initialize.h"
-//#include "pacman.h"
-//#include "ghost.h"
 #include "blockSpawner.h"
 #include "grid.h"
 

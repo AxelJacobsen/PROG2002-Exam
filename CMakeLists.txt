@@ -17,7 +17,7 @@ add_executable(Block_Out
 	main.cpp
 	shaders/blockShad.h
 	shaders/gridShad.h
-	shaders/deadBlockShad.h
+	
 	
 	include/glutil.h
 	"grid.h" 
@@ -30,7 +30,7 @@ add_executable(Block_Out
 	"blockSpawner.h"
 	"blockSpawner.cpp"
 	"camera.h"
-	"camera.cpp"  )
+	"camera.cpp"   "blockSpawner (2).cpp" "shaders/deadBlockShad.h" "shaders/blockShad (2).h")
 
 target_link_libraries(Block_Out
 	PRIVATE

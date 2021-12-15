@@ -273,7 +273,7 @@ void Blockspawner::updateHeight() {
         for (auto& yIt : xIt) { 
             if (yIt != 0){
                 if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt) == 0) {
-                    if (0 < yIt){
+                    if (0 <= yIt){
                         yIt--;
                         if (yIt == 0) { 
                             yIt--;
@@ -305,7 +305,7 @@ bool Blockspawner::getLerpCoords() {
             for (int y = tempXYZ[x].size() - 1; 0 <= y; y--) {
                 if (tempXYZ[x][y] != 0) {
                     if ((y + 1) < tempXYZ[x].size()) {
-                        if (bCamHolder->getCamIntMapVal(x, y + 1, tempXYZ[x][y + 1]) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x, y + 1, (depth - tempXYZ[x][y + 1]) -1) == 0) {
                             tempXYZ[x][y + 1] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -322,7 +322,7 @@ bool Blockspawner::getLerpCoords() {
             for (int y = 0; y < tempXYZ[x].size(); y++) {
                 if (tempXYZ[x][y] != 0) {
                     if (0 <= (y - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x, y - 1, tempXYZ[x][y - 1]) == 0){
+                        if (bCamHolder->getCamIntMapVal(x, y - 1, (depth - tempXYZ[x][y - 1]) -1) == 0){
                         tempXYZ[x][y - 1] = tempXYZ[x][y];
                         tempXYZ[x][y] = 0;
                         }
@@ -339,7 +339,7 @@ bool Blockspawner::getLerpCoords() {
             for (int y = 0; y < spatialXYZ[x].size(); y++) {
                 if (tempXYZ[x][y] != 0) {
                     if (0 <= (x - 1)) {
-                        if (bCamHolder->getCamIntMapVal(x - 1, y, tempXYZ[x - 1][y]) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x - 1, y, (depth - tempXYZ[x - 1][y]) -1) == 0) {
                             tempXYZ[x - 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -356,7 +356,7 @@ bool Blockspawner::getLerpCoords() {
             for (int y = spatialXYZ[x].size() - 1; 0 <= y; y--) {
                 if (tempXYZ[x][y] != 0) {
                     if ((x + 1) < tempXYZ.size()) {
-                        if (bCamHolder->getCamIntMapVal(x + 1, y, tempXYZ[x + 1][y]) == 0) {
+                        if (bCamHolder->getCamIntMapVal(x + 1, y, (depth - tempXYZ[x + 1][y]) -1) == 0) {
                             tempXYZ[x + 1][y] = tempXYZ[x][y];
                             tempXYZ[x][y] = 0;
                         }
@@ -411,13 +411,15 @@ void Blockspawner::killBlock() {
     for (int p = 0; p < width; p++) {
         for (int l = 0; l < height; l++) {
             if (spatialXYZ[p][l] != 0) { if (spatialXYZ[p][l] == -1) { 
-                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l] + 1)); } 
+                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]+1)); } 
             else {
                 bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]));
                 }
             }
         }
     }
+
+    //bCamHolder->printCamIntMap();
 
     lerpStart[0] = 0; lerpStop[0] = 0;
     lerpStart[1] = 0; lerpStop[1] = 0;

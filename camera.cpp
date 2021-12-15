@@ -71,3 +71,16 @@ void Camera::applycamera(const GLuint shader, const float width, const float hei
     GLuint viewMat = glGetUniformLocation(shader, "view");
     glUniformMatrix4fv(viewMat, 1, false, glm::value_ptr(view));
 }
+
+void Camera::printCamIntMap() {
+    for (auto& xIt : gridIntHolder) {
+        for (auto& yIt : xIt) {
+            //for (auto& zIt : yIt) {
+            
+                printf("%i ", yIt[0]);
+            //}
+            //printf("\n");
+        }
+        printf("\n");
+    }
+}

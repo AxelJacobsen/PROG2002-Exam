@@ -43,7 +43,8 @@ public:
     void setCamUp(glm::vec3     newCameraUp)    { cameraUp      = newCameraUp;      };
 
     int     getCamIntMapVal(int x, int y, int z)   { return gridIntHolder[x][y][z];   };
-    void    updateCamIntMap(int x, int y, int z)   { gridIntHolder[x][y][z] =  1; }
+    void    updateCamIntMap(int x, int y, int z)   { gridIntHolder[x][y][z] = 1; }
+    void    printCamIntMap();
     float   getCamFloatMapVal(int x, int y, int z, int XYZ) { return gridFloatHolder[x][y][z][XYZ]; };
 
     int     getNewDesDir() { if (keyCalled) { keyCalled = false; return blockDesDir; } else return -1; };

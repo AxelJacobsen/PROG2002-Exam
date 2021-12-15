@@ -52,6 +52,8 @@ int main(){
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);     //REVISTS
 
     double currentTime = 0.0;
     glfwSetTime(0.0);
@@ -59,7 +61,7 @@ int main(){
     float deltaTime = 0.0f;	// time between current frame and last frame
     float lastFrame = 0.0f;
     float delay     = 0.005f;
-    int   dropDelay = 20;
+    int   dropDelay = 5;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();

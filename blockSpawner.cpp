@@ -7,7 +7,7 @@
 
 void Blockspawner::compileBlockShader() {
     activeBlockShader = CompileShader(blockVertexShaderSrc,
-                                blockFragmentShaderSrc);    
+                                    blockFragmentShaderSrc);    
     deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
                                     deadBlockFragmentShaderSrc);
 
@@ -28,15 +28,15 @@ void Blockspawner::newBlock() {
     int bType = createRandomBlock();
     switch (bType)
     {
-    case 0: genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]); break;
-    case 1: genLblock();    break;
-    case 2: genZblock();    break;
-    case 3: genTblock();    break;
+    case 0: genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]); printf("Creating Cube \n"); break;
+    case 1: genLblock();  printf("Creating L BLock\n");  break;
+    case 2: genZblock();  printf("Creating Z BLock\n");  break;
+    case 3: genTblock();  printf("Creating T BLock\n");  break;
     default: printf("\nILLEGAL BLOCK TYPE\n");
         break;
     }
     if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); }
-    else { liveBlockVAO = compileVertices(); }
+    liveBlockVAO = compileVertices();
 };
 
 int Blockspawner::createRandomBlock() {
@@ -67,13 +67,15 @@ void Blockspawner::drawDeadBlocks() {
     glVertexAttribPointer(dbtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
     auto deadBlockTextureLocation = glGetUniformLocation(deadBlockShader, "u_deadBlockTexture");
+    auto deadBlockColorLocation = glGetUniformLocation(deadBlockShader, "u_Color");
 
     glUseProgram(deadBlockShader);
     bCamHolder->applycamera(deadBlockShader, width, height);
     glBindVertexArray(deadBlockVAO);
     int drawOffset = 0;
     for (int layer = 0; layer < currentblockNum; layer++) {
-        glUniform1i(deadBlockTextureLocation, int(blockList[layer][2]));
+        glUniform1i(deadBlockTextureLocation, 1);
+        glUniform4f(deadBlockColorLocation, abs(blockList[layer][2]), abs(blockList[layer][2]), abs(blockList[layer][2]), 1.0f);
         glDrawElements(GL_TRIANGLES, blockList[currentblockNum].size(), GL_UNSIGNED_INT, (const void*)drawOffset);
         drawOffset += blockList[layer].size();
     }
@@ -113,7 +115,7 @@ GLuint Blockspawner::compileVertices(bool dead) {
     if (dead) {
         int stride = 5;
         for (int i = 0; i < currentblockNum; i++) {
-            for (auto& it : blockList[currentblockNum]) {
+            for (auto& it : blockList[i]) {
                 tempVert.push_back(it);
             }
         }
@@ -231,7 +233,7 @@ void Blockspawner::updateBlockLerp() {
         if (lerpProg >= 1.0f || lerpProg <= 0.0f) {
             lerpProg = 1.0f;
             int newDir = bCamHolder->getNewDesDir();
-            if (newDir != -1) { printf("New Dir found %i\n", newDir); setNewDir(newDir); }
+            if (newDir != -1) { setNewDir(newDir); }
             else { requestChangeDir(); } 
         }
         else if (lerpStart != lerpStop){ lerpProg += lerpStep; }
@@ -265,17 +267,33 @@ void Blockspawner::requestChangeDir() {
 
 void Blockspawner::updateHeight() {
     bool update = true;
+    int xDep = 0;
     for (auto& xIt : spatialXYZ) { 
+        int yDep = 0;
         for (auto& yIt : xIt) { 
-            if (0 < yIt) { yIt--; if (yIt == 0) { yIt--; update = false; } }
+            if (yIt != 0){
+                if (bCamHolder->getCamIntMapVal(xDep, yDep, yIt) == 0) {
+                    if (0 < yIt){
+                        yIt--;
+                        if (yIt == 0) { 
+                            yIt--;
+                            update = false; 
+                        } 
+                    }
+                }
+                else { printf("Crashed at X: %i, Y: %i, Z %i\n", xDep, yDep, yIt); update = false; }
+            }
+            yDep++;
         } 
+        xDep++;
     }
+    lerpStart[2] = lerpStop[2];
+    lerpStop[2] -= Zshift;
+    heightLerp = 0.0f;
     if (update) {
         queuedHeightDrop = true;
-        lerpStart[2] = lerpStop[2];
-        lerpStop[2] -= Zshift;
-        heightLerp = 0.0f;
-    } else { killBlock(); }
+    }
+    else { killBlock(); };
 }
 
 bool Blockspawner::getLerpCoords() {
@@ -354,17 +372,7 @@ bool Blockspawner::getLerpCoords() {
     }
     
     if (legalmove) { spatialXYZ = tempXYZ; }
-    for (int x = 0; x < spatialXYZ.size(); x++) {
-        for (int y = 0; y < spatialXYZ[x].size(); y++) {
-            printf("%i ", spatialXYZ[x][y]);
-        }
-        printf("\n");
-    }
     return legalmove;
-}
-
-bool Blockspawner::checkIfHitEnd() {
-    return false;
 }
 
 /**
@@ -394,16 +402,23 @@ std::vector<float> Blockspawner::performLerp() {
 void Blockspawner::killBlock() { 
     std::vector<float> finalizeLerp = performLerp();
     isActive = false; 
-    int coordTracker = 0;
-    for (auto& cIt : blockList[currentblockNum]) {
-        if (coordTracker < 3) {
-            cIt *= finalizeLerp[coordTracker];
-            printf("%f\t", cIt);
-            coordTracker++;
+    int coordTracker = 1, counter = 0;
+    for (int i = 0; i < blockList[currentblockNum].size(); i+=5) {
+        for (int o = 0; o < 3; o++) {
+            blockList[currentblockNum][(i + o)] += (finalizeLerp[o]);
         }
-        else if (coordTracker == 4) { coordTracker = 0; printf("\n"); }
-        else { coordTracker++; }
     }
+    for (int p = 0; p < width; p++) {
+        for (int l = 0; l < height; l++) {
+            if (spatialXYZ[p][l] != 0) { if (spatialXYZ[p][l] == -1) { 
+                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l] + 1)); } 
+            else {
+                bCamHolder->updateCamIntMap(p, l, (spatialXYZ[p][l]));
+                }
+            }
+        }
+    }
+
     lerpStart[0] = 0; lerpStop[0] = 0;
     lerpStart[1] = 0; lerpStop[1] = 0;
     lerpStart[2] = 0; lerpStop[2] = 0;

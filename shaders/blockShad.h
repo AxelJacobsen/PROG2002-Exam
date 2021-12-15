@@ -41,8 +41,8 @@ uniform vec4 u_Color;
 void main()
 {
 	vec4 textColorB = texture(u_BlockTexture, vsTexcoord);
-	if(textColorB.a < 0.1)
-        discard;
+	if(textColorB.a < 0.1){
+        discard;}
 	color = textColorB;
 }
 )";

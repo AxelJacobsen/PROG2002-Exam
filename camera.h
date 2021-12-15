@@ -23,14 +23,12 @@ private:
 
     float yaw   = 180.0f;
     float pitch = 0.0f;
-    float lastX = 0;
-    float lastY = 0;
     float fov   = 100.0f;
-    int   pacCard = 0;
     int   screenWidth = 1000,
           screenHeight = 1000;
 
-    bool  keyCalled = false;
+    bool  keyCalled = false,
+          spaceCalled = false;
     int   blockDesDir = 2;
 public:
     Camera() {};
@@ -48,7 +46,6 @@ public:
 
     int     getNewDesDir() { if (keyCalled) { keyCalled = false; return blockDesDir; } else return -1; };
     void    setNewDesDir(int newDir) { blockDesDir = newDir; keyCalled = true; }
-    int     checkCardinal(const float xRot, const float yRot);
     GLfloat getCoordsWithInt(int y, int x, int loop, float Xshift, float Yshift, float Zshift);
     void    applycamera(const GLuint shader, const float width, const float height);
 
@@ -56,6 +53,7 @@ public:
     void    recieveFloatMap(std::vector<std::vector<std::vector<std::vector<float>>>> floatMap) { gridFloatHolder = floatMap;}
 
     std::pair<int, int> getScreenSize() { std::pair<int, int> wh = { screenWidth, screenHeight }; return wh; }
+    bool    updateSpace(bool update) { if (update) { if (spaceCalled) { spaceCalled = false; } else { spaceCalled = true; printf("Space pressed!\n"); } }  return spaceCalled; };
 };
 
 #endif

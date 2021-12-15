@@ -54,12 +54,13 @@ int main(){
 
     double currentTime = 0.0;
     glfwSetTime(0.0);
-    float frequency = currentTime;
-    float deltaTime = 0.0f;	// time between current frame and last frame
-    float lastFrame = 0.0f;
-    float delay     = 0.005f;
-    int   dropDelay = 5;
-    int   initialDelay = 20*dropDelay;
+    float frequency = currentTime,
+        deltaTime = 0.0f,	// time between current frame and last frame
+        lastFrame = 0.0f,
+        delay     = 0.005f;
+    int   dropDelay = 10,
+          activeDropDelay = dropDelay,
+          initialDelay = 20*dropDelay;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
@@ -81,12 +82,16 @@ int main(){
             BlockSpawner->updateBlockLerp();
             BlockSpawner->updateBlockDepthLerp();
             frequency = currentTime;
+            bool spacePressed = cameraAdress->updateSpace(false);
             if (initialDelay == 0){
-                if (dropDelay == 0) {
-                    dropDelay = 5;
-                    BlockSpawner->updateHeight();
+                if (activeDropDelay == 0) {
+                    if (spacePressed) { activeDropDelay = 1; } 
+                    else {
+                        activeDropDelay = dropDelay;
+                    }
+                    BlockSpawner->updateHeight(spacePressed);
                 }
-                else if (!BlockSpawner->checkForQueue()) { dropDelay--; }
+                else if (!BlockSpawner->checkForQueue()) { activeDropDelay--; }
                 }
             else { initialDelay--; }
 

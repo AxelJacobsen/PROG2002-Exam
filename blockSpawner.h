@@ -39,8 +39,8 @@ private:
             heightUpdated = true,
             queuedHeightDrop = false;
 
-    GLuint  liveBlockVAO,
-            deadBlockVAO,
+    GLuint  liveBlockVAO = -1,
+            deadBlockVAO = -1,
             activeBlockShader = -1,
             deadBlockShader   = -1;
 
@@ -56,7 +56,7 @@ public:
         spatialXYZ =
                 std::vector<std::vector<int>>(width,
                 std::vector<int>(height));
-        compileActiveBlockShader();
+        //compileActiveBlockShader();
     };
     ~Blockspawner() {};
 
@@ -82,7 +82,7 @@ public:
     void  killBlock();
     void  requestChangeDir();
     bool  checkIfLegalDir(int newDir);
-    void  updateHeight();
+    void  updateHeight(bool space);
     bool  getHeightUpdated() { if (heightUpdated) { heightUpdated = false; 
                                                     return true;  }
                                                     return false; }

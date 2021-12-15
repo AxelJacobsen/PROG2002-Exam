@@ -3,23 +3,6 @@
 // -----------------------------------------------------------------------------
 // Camera Class function definition
 // -----------------------------------------------------------------------------
-
-/**
- *  Handles checking what cardinal Direction the camera is facing relative to the map
- *
- *  @param xRot - xRot x of front of camera
- *  @param yRot - yRot y of front of camera
- *
- *  @return a number representing what direction the camera is facing
- */
-int Camera::checkCardinal(const float xRot, const float yRot) {
-    if ((xRot < 0.5 && -0.5f < xRot) && (0.5f < yRot)) { return 0; } //North
-    else if ((0.5f < xRot) && (yRot < 0.5 && -0.5f < yRot)) { return 1; } //East
-    else if ((xRot < 0.5 && -0.5f < xRot) && (yRot < -yRot)) { return 2; } //South
-    else if ((xRot < -0.5f) && (yRot < 0.5 && -0.5f < yRot)) { return 3; } //East
-    else return -1;
-};
-
 /**
  *  returns coordinates based on give x y and "loop"
  *

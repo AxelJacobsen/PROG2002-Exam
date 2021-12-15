@@ -11,7 +11,7 @@ void Blockspawner::compileActiveBlockShader() {
 
     GLint bposAttrib = glGetAttribLocation(activeBlockShader, "bPosition");
     glEnableVertexAttribArray(bposAttrib);
-    glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 }
 
 void Blockspawner::compileDeadBlockShader() {
@@ -22,6 +22,9 @@ void Blockspawner::compileDeadBlockShader() {
     glEnableVertexAttribArray(dbposAttrib);
     glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
     
+    GLuint dbcolorAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
+    glEnableVertexAttribArray(dbcolorAttrib);
+    glVertexAttribPointer(dbcolorAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 }
 
 void Blockspawner::newBlock() {
@@ -32,13 +35,14 @@ void Blockspawner::newBlock() {
     int bType = createRandomBlock();
     switch (bType)
     {
-    case 0: genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]); printf("Creating Cube \n"); break;
-    case 1: genLblock();  printf("Creating L BLock\n");  break;
-    case 2: genZblock();  printf("Creating Z BLock\n");  break;
-    case 3: genTblock();  printf("Creating T BLock\n");  break;
+    case 0: genCube(spawnPoint[0], spawnPoint[1], spawnPoint[2]); break;
+    case 1: genLblock();  break;
+    case 2: genZblock();  break;
+    case 3: genTblock();  break;
     default: printf("\nILLEGAL BLOCK TYPE\n");
         break;
     }
+
     if (currentblockNum != 0) { deadBlockVAO = compileVertices(true); }
     liveBlockVAO = compileVertices();
 };
@@ -51,6 +55,8 @@ int Blockspawner::createRandomBlock() {
 };
 
 void Blockspawner::drawActiveBlocks() {
+    if (activeBlockShader == -1) { compileActiveBlockShader(); }
+
     auto activeBlockColorLocation = glGetUniformLocation(activeBlockShader, "u_Color");
     glUseProgram(activeBlockShader);
     bCamHolder->applycamera(activeBlockShader, width, height);
@@ -63,10 +69,6 @@ void Blockspawner::drawActiveBlocks() {
 }
 
 void Blockspawner::drawDeadBlocks() {
-    GLuint dbcolorAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
-    glEnableVertexAttribArray(dbcolorAttrib);
-    glVertexAttribPointer(dbcolorAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
     if (deadBlockShader == -1) { compileDeadBlockShader(); }
     
     glUseProgram(deadBlockShader);
@@ -77,8 +79,6 @@ void Blockspawner::drawDeadBlocks() {
         drawSize += blockList[layer].size();
     }
     glDrawElements(GL_TRIANGLES, drawSize, GL_UNSIGNED_INT, (const void*)0);
-        
-    
 }
 
 /**
@@ -162,9 +162,9 @@ void Blockspawner::genCube(int x, int y, int z) {
             rep++;
         }
         //Color coords, arent used untill dead
-        blockList[currentblockNum].push_back(0.0f);
-        blockList[currentblockNum].push_back(0.0f);
-        blockList[currentblockNum].push_back(0.0f);
+        blockList[currentblockNum].push_back(0.6f);
+        blockList[currentblockNum].push_back(0.6f);
+        blockList[currentblockNum].push_back(0.6f);
         loop++;
     }
 }
@@ -233,12 +233,13 @@ void Blockspawner::updateBlockLerp() {
 }
 
 void Blockspawner::updateBlockDepthLerp() {
+    int speedMod = 1;
     if (isActive && queuedHeightDrop) {
         if (heightLerp >= 1.0f || heightLerp < 0.0f) {
             heightLerp = 1.0f;
             queuedHeightDrop = false;
         }
-        else if (lerpStart != lerpStop) { heightLerp += lerpStep; }
+        else if (lerpStart != lerpStop) { if (bCamHolder->updateSpace(false)) { speedMod = 5; } heightLerp += lerpStep * speedMod; }
     }
 }
 
@@ -254,7 +255,7 @@ void Blockspawner::requestChangeDir() {
     }
 }
 
-void Blockspawner::updateHeight() {
+void Blockspawner::updateHeight(bool space) {
     bool update = true;
     int xDep = 0;
     for (auto& xIt : spatialXYZ) {
@@ -394,6 +395,7 @@ std::vector<float> Blockspawner::performLerp() {
 }
 
 void Blockspawner::killBlock() {
+    if (bCamHolder->updateSpace(false)) { bCamHolder->updateSpace(true); }
     heightLerp = 1.0f;
     std::vector<float> finalizeLerp = performLerp();
     isActive = false;
@@ -453,6 +455,6 @@ std::vector<float> Blockspawner::getColorsWithFloat(float colorDepth) {
     case  4:  {std::vector<float> tempColors{ 0.9f,0.0f,0.9f }; return tempColors; } break;
     case  6:  {std::vector<float> tempColors{ 0.9f,0.9f,0.0f }; return tempColors; } break;
     case  8:  {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
-    default: printf("Couldnt find coords\n"); {std::vector<float> tempColors{ 0.0f,0.0f,0.0f }; return tempColors; } break;
+    default: printf("Couldnt find coords\n"); {std::vector<float> tempColors{ 1.0f,1.0f,1.0f }; return tempColors; } break;
     }
 }

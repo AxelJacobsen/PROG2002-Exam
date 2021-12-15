@@ -8,7 +8,7 @@ static const std::string blockVertexShaderSrc = R"(
 
 /** Inputs */
 in vec3 bPosition;
-in vec3 btext;
+in vec3 bColor;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -27,7 +27,6 @@ static const std::string blockFragmentShaderSrc = R"(
 
 /** Outputs */
 out vec4 color;
-
 
 uniform vec4 u_Color;
 

@@ -12,16 +12,22 @@ void Blockspawner::compileActiveBlockShader() {
     GLint bposAttrib = glGetAttribLocation(activeBlockShader, "bPosition");
     glEnableVertexAttribArray(bposAttrib);
     glVertexAttribPointer(bposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    
+    GLuint dcolorAttrib = glGetAttribLocation(activeBlockShader, "bColor");
+    glEnableVertexAttribArray(dcolorAttrib);
+    glVertexAttribPointer(dcolorAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 }
 
 void Blockspawner::compileDeadBlockShader() {
     deadBlockShader = CompileShader(deadBlockVertexShaderSrc,
                                     deadBlockFragmentShaderSrc);
 
-    GLint dbposAttrib = glGetAttribLocation(activeBlockShader, "dbPosition");
+    GLint dbposAttrib = glGetAttribLocation(deadBlockShader, "dbPosition");
     glEnableVertexAttribArray(dbposAttrib);
     glVertexAttribPointer(dbposAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
     
+
+
     GLuint dbcolorAttrib = glGetAttribLocation(deadBlockShader, "dbColor");
     glEnableVertexAttribArray(dbcolorAttrib);
     glVertexAttribPointer(dbcolorAttrib, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -70,15 +76,11 @@ void Blockspawner::drawActiveBlocks() {
 
 void Blockspawner::drawDeadBlocks() {
     if (deadBlockShader == -1) { compileDeadBlockShader(); }
-    
+
     glUseProgram(deadBlockShader);
     bCamHolder->applycamera(deadBlockShader, width, height);
     glBindVertexArray(deadBlockVAO);
-    int drawSize = 0;
-    for (int layer = 0; layer < currentblockNum; layer++) {
-        drawSize += blockList[layer].size();
-    }
-    glDrawElements(GL_TRIANGLES, drawSize, GL_UNSIGNED_INT, (const void*)0);
+    glDrawElements(GL_TRIANGLES, deadSize, GL_UNSIGNED_INT, (const void*)0);
 }
 
 /**
@@ -119,6 +121,7 @@ GLuint Blockspawner::compileVertices(bool dead) {
                 tempVert.push_back(it);
             }
         }
+        deadSize = tempVert.size();
         return CreateObject(&tempVert[0], tempVert.size() * sizeof(tempVert[0]), stride, false);
     }
     else return -1;
@@ -161,6 +164,8 @@ void Blockspawner::genCube(int x, int y, int z) {
                     tempBasePoints[2], hList[loop], rep));
             rep++;
         }
+        
+
         //Color coords, arent used untill dead
         blockList[currentblockNum].push_back(0.6f);
         blockList[currentblockNum].push_back(0.6f);
@@ -216,6 +221,29 @@ float Blockspawner::generateBlockCoord(float x, float y, float z, int mod, int l
     default:  return (float(z) + (Zshift * mod));
     }
 } 
+
+void Blockspawner::handleBLockTextureCoords(int loop) {
+    std::pair <int, int> temp = { 0,0 };
+    switch (loop) {
+    case 0:                     break;
+    case 3:  temp.first = 1;    break;
+    case 1:  temp.second = 1;   break;
+    case 2:  temp = { 1, 1 };   break;
+    default: temp = { -1,-1 };  break;
+    }
+    blockList[currentblockNum].push_back(temp.first);
+    blockList[currentblockNum].push_back(temp.second);
+}
+
+/**
+ *  Loads texture for map Wall
+ *
+ *  @see load_opengl_texture(const std::string& filepath, GLuint slot)
+ */
+void Blockspawner::loadBlockSprite() {
+    blockSprite = load_opengl_texture("assets/ghostModelShader.png", 1);
+}
+
 
 void Blockspawner::updateBlockLerp() {
     if (isActive) {

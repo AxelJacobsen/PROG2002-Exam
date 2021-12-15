@@ -33,7 +33,8 @@ private:
     int     currentblockNum = -1,
             width, height, depth,
             requestedDir = 1,
-            spawnPoint[3] = { 0, 4, 9 };
+            spawnPoint[3] = { 0, 4, 9 },
+            deadSize = 0;
 
     bool    animFlip = true,            //For ghosts flipflops between frames for pac decides which direction to animate
             heightUpdated = true,
@@ -42,7 +43,8 @@ private:
     GLuint  liveBlockVAO = -1,
             deadBlockVAO = -1,
             activeBlockShader = -1,
-            deadBlockShader   = -1;
+            deadBlockShader   = -1,
+            blockSprite;
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
     std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
@@ -97,6 +99,7 @@ public:
     std::vector<float> performLerp();
     std::vector<float> getColorsWithFloat(float colorDepth);
     void printBlockLContent(int desLayer);
+    void loadBlockSprite();
 };  
 
 #endif

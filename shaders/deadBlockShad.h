@@ -18,8 +18,8 @@ out vec3 vsColors;
 
 void main()
 {
-vsColors    =  dbColor;
 gl_Position =  projection * view * vec4(dbPosition, 1.0f);
+vsColors    =  dbColor;
 }
 )";
 

@@ -108,9 +108,10 @@ GLuint load_opengl_texture(const std::string& filepath, GLuint slot)
 /**
  *  Creates object
  *
- *  @param object    - pointer to object to be created
- *  @param size      - size of object
- *  @param stride    - stride used in object
+ *  @param object        - pointer to object to be created
+ *  @param size          - size of object
+ *  @param stride        - stride used in object
+ *  @param drawAsOutline - decides what type of indices to use
  *
  *  @return     returns vao
  */

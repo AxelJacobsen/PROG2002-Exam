@@ -22,9 +22,9 @@ private:
             failDelay = false;
     float   lerpStart[3]{0},               //Contains start coords of LERP
             lerpStop[3]{0},                //Contains stop  coords of LERP
-            speedDiv = 10.0f,           //Higher number = slower speed
-            lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
-            lerpProg = lerpStep,        //defines progress as step to avoid hickups
+            speedDiv   = 10.0f,            //Higher number = slower speed
+            lerpStep   = 1.0f / speedDiv,  //Speed of LERP, also slowed by frequency in main
+            lerpProg   = lerpStep,         //defines progress as step to avoid hickups
             heightLerp = lerpStep,
             Xshift = 0.0f, 
             Yshift = 0.0f, 
@@ -62,44 +62,46 @@ public:
     };
     ~Blockspawner() {};
 
-    void newBlock();
-    int createRandomBlock();
-    void drawActiveBlocks();
-    void drawDeadBlocks();
-    GLuint compileVertices();
-    GLuint compileVertices(bool dead);
-    void compileActiveBlockShader();
-    void compileDeadBlockShader();
-
+    
+    
+    void  newBlock();
+    int   createRandomBlock();
     void  genCube(int x, int y, int z);
     void  genLblock();
     void  genZblock();
     void  genTblock();
     float generateBlockCoord(float x, float y, float z, int mod, int loop);
-    void  setXYZshift(std::vector<float> XYZshift) { Xshift = XYZshift[0], Yshift = XYZshift[1], Zshift = XYZshift[2]; }
-    void  getCameraPointer(Camera* newCamera) { bCamHolder = newCamera; };
     void  handleBLockTextureCoords(int loop);
+    bool  generateLerpCoords();
+
+    void  requestChangeDir();
     void  updateBlockLerp();
     void  updateBlockDepthLerp();
-    void  killBlock();
-    void  requestChangeDir();
-    bool  checkIfLegalDir(int newDir);
     void  updateHeight(bool space);
-    bool  getHeightUpdated() { if (heightUpdated) { heightUpdated = false; 
-                                                    return true;  }
-                                                    return false; }
-    void  setNewDir(int newDir) { requestedDir = newDir; }
-    bool  getLerpCoords();
-    int   getCurrentBlock() { return currentblockNum; };
-    bool  checkIfHitEnd();
-    void  transformBlock();
-    void  initializeLerp();
-    bool  isRun(bool stop) { if (stop) { run = false; } return run; }
-    bool  checkForQueue() { return queuedHeightDrop; }
+    void  killBlock();
+
+    void   drawActiveBlocks();
+    void   drawDeadBlocks();
+    void   transformBlock();
+    GLuint compileVertices();
+    GLuint compileVertices(bool dead);
+    void   compileActiveBlockShader();
+    void   compileDeadBlockShader();
+    
     std::vector<float> performLerp();
     std::vector<float> getColorsWithFloat(float colorDepth);
     void printBlockLContent(int desLayer);
     void loadBlockSprite();
+    
+    void  setNewDir(int newDir) { requestedDir = newDir; }
+    void  setXYZshift(std::vector<float> XYZshift) { Xshift = XYZshift[0], Yshift = XYZshift[1], Zshift = XYZshift[2]; }
+
+    bool  isRun(bool stop) { if (stop) { run = false; } return run; }
+    bool  checkForQueue() { return queuedHeightDrop; }
+    int   getCurrentBlock() { return currentblockNum; };
+    void  getCameraPointer(Camera* newCamera) { bCamHolder = newCamera; };
+    bool  getHeightUpdated() { if (heightUpdated) { heightUpdated = false; return true; } return false; }
+
     void cleanBlockSpawner() {
         glDeleteProgram(activeBlockShader);
         glDeleteProgram(deadBlockShader);

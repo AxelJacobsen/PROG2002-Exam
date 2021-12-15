@@ -33,27 +33,28 @@ private:
 public:
     Grid(int w, int h, int d);
     void   gridTextureFloatCreate();
-    int    findWhatLines(const int x, const int y);
-    void   compileGridShader();
-    void   callCreateGridVao();
-    void   loadGridSprite();
-    GLuint createGrid(float size, bool texture);
-    void   cleanGrid();
+    void   handleGridTexCoords(int rep);
+    void   fillGridCoords();
+    void   drawGrid();
+
     //Getters
     GLuint getGridShader()   { return gridShaderProgram; };
     GLuint getGridVAO()      { return gridVAO; };
     GLuint getGridTexture()  { return gridSprite; };
     int    getGridSize()     { return gridF.size(); };
     int    getGridVal(int x, int y, int z) { return gridContI[x][y][z]; };
-
     std::vector<float>getXYZshift() { std::vector<float>XYZshift = { Xshift,Yshift,Zshift }; return XYZshift; };
     std::vector<int>getWHD() { std::vector<int>WidHeiDep = { width,height,depth }; return WidHeiDep; };
     std::vector<std::vector<std::vector<int>>>   getIntGrid()   { return gridContI; }
     std::vector<std::vector<std::vector<std::vector<float>>>> getFloatGrid() { return gridContF; }
-    void drawGrid();
     void getGridCameraPointer(Camera* newCamera) { gCamHolder = newCamera; };
-    void handleGridTexCoords(int rep);
-    void fillGridCoords();
+
+    void compileGridShader();
+    void callCreateGridVao();
+    void loadGridSprite();
+
+    GLuint createGridVAO(float size, bool texture);
+    void   cleanGrid();
 };  
 
 #endif

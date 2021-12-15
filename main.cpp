@@ -11,7 +11,6 @@
  *   @file     main.cpp
  *   @author   Axel E.W. Jacobsen, Rafael P. Avalos, Mekides A. Abebe
  */
-#define TINYOBJLOADER_IMPLEMENTATION
 #include "initialize.h"
 #include "blockSpawner.h"
 #include "grid.h"
@@ -55,13 +54,12 @@ int main(){
     double currentTime = 0.0;
     glfwSetTime(0.0);
     float frequency = currentTime,
-        deltaTime = 0.0f,	// time between current frame and last frame
-        lastFrame = 0.0f,
-        delay     = 0.005f;
+          deltaTime = 0.0f,	// time between current frame and last frame
+          delay     = 0.005f;
     int   dropDelay = 10,
-        activeDropDelay = dropDelay,
-        initialDelay = dropDelay*10;
-    bool fullscreen = false;
+          activeDropDelay = dropDelay,
+          initialDelay = dropDelay*10;
+    bool  fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
     bool first = true;
@@ -72,8 +70,6 @@ int main(){
 
         //update Time
         currentTime = glfwGetTime();
-        deltaTime = currentTime - lastFrame;
-        lastFrame = currentTime;
         if (BlockSpawner->isRun(false)){
         gGrid->drawGrid();
         
@@ -100,9 +96,6 @@ int main(){
         if (0 < BlockSpawner->getCurrentBlock()) {
             BlockSpawner->drawDeadBlocks();
         }
-       
-        
-
         glfwSwapBuffers(window);
         }
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

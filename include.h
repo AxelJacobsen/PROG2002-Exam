@@ -13,7 +13,7 @@
 #include "shaders/blockShad.h"
 #include "shaders/deadBlockShad.h"
 
- //Library Inclusion
+//Library Inclusion
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>

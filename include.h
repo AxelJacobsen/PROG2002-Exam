@@ -11,6 +11,7 @@
  //Shader Inclusion
 #include "shaders/gridShad.h"
 #include "shaders/blockShad.h"
+#include "shaders/deadBlockShad.h"
 
  //Library Inclusion
 #include <glad/glad.h>

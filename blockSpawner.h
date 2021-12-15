@@ -24,6 +24,7 @@ private:
             speedDiv = 10.0f,           //Higher number = slower speed
             lerpStep = 1.0f / speedDiv, //Speed of LERP, also slowed by frequency in main
             lerpProg = lerpStep,        //defines progress as step to avoid hickups
+            heightLerp = lerpStep,
             Xshift = 0.0f, 
             Yshift = 0.0f, 
             Zshift = 0.0f;
@@ -33,12 +34,14 @@ private:
             requestedDir = 1,
             spawnPoint[3] = { 0, 4, 9 };
 
-    bool    animFlip = true;            //For ghosts flipflops between frames for pac decides which direction to animate
-    bool    heightUpdated = true;
+    bool    animFlip = true,            //For ghosts flipflops between frames for pac decides which direction to animate
+            heightUpdated = true,
+            queuedHeightDrop = false;
 
     GLuint  liveBlockVAO,
             deadBlockVAO,
-            blockShader,
+            activeBlockShader,
+            deadBlockShader,
             blockSprite;
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
@@ -76,7 +79,8 @@ public:
     void  handleBLockTextureCoords(int loop);
     void  loadBlockSprite();
     void  updateBlockLerp();
-    void  killBlock() { isActive = false; for (auto& xIt : spatialXYZ) { for (auto& yIt : xIt) { yIt = 0; } } };
+    void  updateBlockDepthLerp();
+    void  killBlock();
     void  requestChangeDir();
     bool  checkIfLegalDir(int newDir);
     void  updateHeight();
@@ -89,6 +93,8 @@ public:
     void  transformBlock();
     void  initializeLerp();
     bool  isRun(bool stop) { if (stop) { run = false; } return run; }
+    bool  checkForQueue() { return queuedHeightDrop; }
+    std::vector<float> performLerp();
 };  
 
 #endif

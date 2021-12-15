@@ -82,17 +82,19 @@ int main(){
             first = false;
             //printf("Updating Lerp\n");
             BlockSpawner->updateBlockLerp();
+            BlockSpawner->updateBlockDepthLerp();
             //printf("Lerp updated\n");
             frequency = currentTime;
             if (dropDelay == 0) {
-                dropDelay = 20;
+                dropDelay = 50;
                 BlockSpawner->updateHeight();
             }
-            else { dropDelay--; }
+            else if (!BlockSpawner->checkForQueue()) { dropDelay--; }
         }
 
         //printf("Drawing Active blocks\n");
         BlockSpawner->drawActiveBlocks();
+        BlockSpawner->drawDeadBlocks();
         //printf("Blocks drawn\n");
         
 

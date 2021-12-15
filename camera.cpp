@@ -75,11 +75,11 @@ void Camera::applycamera(const GLuint shader, const float width, const float hei
 void Camera::printCamIntMap() {
     for (auto& xIt : gridIntHolder) {
         for (auto& yIt : xIt) {
-            //for (auto& zIt : yIt) {
+            for (auto& zIt : yIt) {
             
-                printf("%i ", yIt[0]);
-            //}
-            //printf("\n");
+                printf("%i ", zIt);
+            }
+            printf("\n");
         }
         printf("\n");
     }

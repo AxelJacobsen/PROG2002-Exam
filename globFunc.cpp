@@ -201,18 +201,33 @@ GLuint load_opengl_texture(const std::string& filepath, GLuint slot)
  *
  *  @return     returns vao
  */
-GLuint CreateObject(GLfloat* object, int size, const int stride)
+GLuint CreateObject(GLfloat* object, int size, const int stride, bool drawAsOutline)
 {
     std::vector<GLuint> object_indices;
+    if (drawAsOutline){
+        for (int i = 0; i < size / 4; i += 4) {
+            object_indices.push_back((i));
+            object_indices.push_back((i + 1));
 
-    for (int i = 0; i < size; i += 4) {
-        for (int o = 0; o < 2; o++) {
-            for (int p = i; p < (i + 3); p++) {
-                object_indices.push_back(getIndices(i, o, p));
-            }
+            object_indices.push_back((i + 1));
+            object_indices.push_back((i + 2));
+
+            object_indices.push_back((i + 2));
+            object_indices.push_back((i + 3));
+
+            object_indices.push_back((i + 3));
+            object_indices.push_back((i));
         }
-    };
-
+    }
+    else {
+        for (int i = 0; i < size; i += 4) {
+            for (int o = 0; o < 2; o++) {
+                for (int p = i; p < (i + 3); p++) {
+                    object_indices.push_back(getIndices(i, o, p));
+                }
+            }
+        };
+    }
     GLuint vao;
     glCreateVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -236,35 +251,6 @@ GLuint CreateObject(GLfloat* object, int size, const int stride)
     return vao;
 };
 
-/**
- *  Creates object
- *
- *  @param object    - pointer to object to be created
- *  @param size      - size of object
- *  @param stride    - stride used in object
- *  @param noEbo     - signals to not create an EBO, not actually used due to overload
- *
- *  @return     returns vao
- */
-GLuint CreateObject(GLfloat* object, int size, const int stride, bool noEbo)
-{
-    GLuint vao;
-    glCreateVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-        size,
-        (&object[0]),
-        GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (sizeof(GLfloat) * stride), (const void*)0);
-
-    return vao;
-};
 // -----------------------------------------------------------------------------
 // GLOBAL FUNCTIONS
 // -----------------------------------------------------------------------------

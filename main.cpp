@@ -43,17 +43,16 @@ int main(){
 
     cameraAdress->recieveIntMap(gGrid->getIntGrid());
     cameraAdress->recieveFloatMap(gGrid->getFloatGrid());
-    printf("Map Loaded\n");
 
     BlockSpawner = new Blockspawner(gGrid->getWHD());
     BlockSpawner->getCameraPointer(cameraAdress);
     BlockSpawner->setXYZshift(XYZshift);
-    printf("Blockloader Loaded\n");
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);     //REVISTS
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     double currentTime = 0.0;
     glfwSetTime(0.0);
@@ -62,6 +61,7 @@ int main(){
     float lastFrame = 0.0f;
     float delay     = 0.005f;
     int   dropDelay = 5;
+    int   initialDelay = 20*dropDelay;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();
@@ -76,28 +76,25 @@ int main(){
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
         if (BlockSpawner->isRun(false)){
-        //printf("Drawing Grid\n");
         gGrid->drawGrid();
-        //printf("Grid drawn\n");
         
         if ((currentTime > (frequency + delay)) || first) {
             first = false;
-            //printf("Updating Lerp\n");
             BlockSpawner->updateBlockLerp();
             BlockSpawner->updateBlockDepthLerp();
-            //printf("Lerp updated\n");
             frequency = currentTime;
-            if (dropDelay == 0) {
-                dropDelay = 50;
-                BlockSpawner->updateHeight();
-            }
-            else if (!BlockSpawner->checkForQueue()) { dropDelay--; }
-        }
+            if (initialDelay == 0){
+                if (dropDelay == 0) {
+                    dropDelay = 50;
+                    BlockSpawner->updateHeight();
+                }
+                else if (!BlockSpawner->checkForQueue()) { dropDelay--; }
+                }
+            else { initialDelay--; }
 
-        //printf("Drawing Active blocks\n");
+        }
         BlockSpawner->drawActiveBlocks();
         BlockSpawner->drawDeadBlocks();
-        //printf("Blocks drawn\n");
         
 
         glfwSwapBuffers(window);

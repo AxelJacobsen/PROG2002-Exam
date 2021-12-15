@@ -43,7 +43,8 @@ private:
             deadBlockVAO,
             activeBlockShader,
             deadBlockShader,
-            blockSprite;
+            blockSprite,
+            deadBlockSprites[10];
 
     std::vector<std::vector<float>>blockList;  //Holds all floats for all cubes
     std::vector<std::vector<int>> spatialXYZ;  //holds position of shape correctly in the XYZ space
@@ -96,6 +97,7 @@ public:
     bool  isRun(bool stop) { if (stop) { run = false; } return run; }
     bool  checkForQueue() { return queuedHeightDrop; }
     std::vector<float> performLerp();
+    std::vector<float> getColorsWithFloat(float colorDepth);
 };  
 
 #endif

@@ -17,8 +17,7 @@ add_executable(Block_Out
 	main.cpp
 	shaders/blockShad.h
 	shaders/gridShad.h
-    
-	
+	shaders/deadBlockShad.h
 	
 	include/glutil.h
 	"grid.h" 
@@ -31,7 +30,7 @@ add_executable(Block_Out
 	"blockSpawner.h"
 	"blockSpawner.cpp"
 	"camera.h"
-	"camera.cpp"  "shaders/deadBlockShad.h")
+	"camera.cpp"  )
 
 target_link_libraries(Block_Out
 	PRIVATE
@@ -53,17 +52,11 @@ target_compile_definitions(${PROJECT_NAME}
   add_custom_command(
   TARGET ${PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_SOURCE_DIR}/assets/pacman.png
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/pacman.png)
+  ${CMAKE_SOURCE_DIR}/assets/ghostModelShader.png
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/ghostModelShader.png)
 
-    add_custom_command(
+  add_custom_command(
   TARGET ${PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
   ${CMAKE_SOURCE_DIR}/assets/wallTexture.png
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/wallTexture.png)
-
-      add_custom_command(
-  TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_SOURCE_DIR}/assets/ghostModelShader.png
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/ghostModelShader.png)

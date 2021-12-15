@@ -155,15 +155,17 @@ void Grid::fillGridCoords() {
 void Grid::compileGridShader(){
     gridShaderProgram = CompileShader(   gridVertexShaderSrc,
                                          gridFragmentShaderSrc);
-
+    
     GLint gPosAttrib = glGetAttribLocation(gridShaderProgram, "gPosition");
     glEnableVertexAttribArray(gPosAttrib);
     glVertexAttribPointer(gPosAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+    
     callCreateGridVao();
 
     GLuint gtexAttrib = glGetAttribLocation(gridShaderProgram, "gTexcoord");
     glEnableVertexAttribArray(gtexAttrib);
     glVertexAttribPointer(gtexAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    
 }
 
 void Grid::callCreateGridVao() {

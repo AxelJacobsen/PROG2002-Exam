@@ -58,7 +58,7 @@ public:
         spatialXYZ =
                 std::vector<std::vector<int>>(width,
                 std::vector<int>(height));
-        //compileActiveBlockShader();
+        loadBlockSprite();
     };
     ~Blockspawner() {};
 

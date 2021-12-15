@@ -8,6 +8,7 @@ static const std::string blockVertexShaderSrc = R"(
 
 /** Inputs */
 in vec3 bPosition;
+in vec2 bTexture;
 in vec3 bColor;
 
 uniform mat4 view;

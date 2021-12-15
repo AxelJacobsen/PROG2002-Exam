@@ -47,9 +47,9 @@ int main(){
     BlockSpawner->setXYZshift(XYZshift);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glEnable(GL_MULTISAMPLE);
+
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);     //REVISTS
+    glEnable(GL_BLEND);     
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     double currentTime = 0.0;
@@ -59,8 +59,8 @@ int main(){
         lastFrame = 0.0f,
         delay     = 0.005f;
     int   dropDelay = 10,
-          activeDropDelay = dropDelay,
-          initialDelay = 20*dropDelay;
+        activeDropDelay = dropDelay,
+        initialDelay = dropDelay;//*20;
     bool fullscreen = false;
 
     std::pair<int, int> wihi = cameraAdress->getScreenSize();

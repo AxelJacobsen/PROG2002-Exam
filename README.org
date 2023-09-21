@@ -1,7 +1,7 @@
 * Task description
 This exam required us to develop a 3d Tetris-like game in which the player has to manouver pieces in a 3d enviroment, and create a "floor" which gets removed when it is completed, such that the player may continue playing.
 
-### State of the game
+* State of the game
 As the game stands it is left as it was when i delievered the exam, it is kept as a milestone in my development journey.
 
 * Textures:

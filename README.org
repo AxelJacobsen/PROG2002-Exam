@@ -1,6 +1,11 @@
-* Textures:
-All textures used are from the video game minecraft
+* Task description
+This exam required us to develop a 3d Tetris-like game in which the player has to manouver pieces in a 3d enviroment, and create a "floor" which gets removed when it is completed, such that the player may continue playing.
 
-* Teacher functions:
-Most of the functions in globFunc.cpp are functions that the teacher has given us, though i believe almost all are
-slightly altered to suit my program.
+### State of the game
+As the game stands it is left as it was when i delievered the exam, it is kept as a milestone in my development journey.
+
+* Textures:
+All textures used are from the video game minecraft as permitted by the proffessor.
+
+* Provided functions:
+Most of the functions in globFunc.cpp are functions that our proffessor has provided, though most are altered to suit my program.
